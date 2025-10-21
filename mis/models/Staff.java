@@ -59,7 +59,7 @@ public class Staff extends Person
      */
     public void assignTask(String task)
     {
-        System.out.println(getName() + "assigned to: " + task);
+        System.out.println(getName() + " assigned to: " + task);
     }
 
     /**

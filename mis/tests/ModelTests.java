@@ -3,7 +3,7 @@ package mis.tests;
 import mis.models.*;
 
 /**
- * Simple test class to demonstrate the functionality of Student and Staff models.
+ * Simple test class for phase 2 of the MIS System to demonstrate the functionality of Student and Staff models.
  * Acts as a manual unit test for verifying constructors, methods and inheritance.
  */
 public class ModelTests

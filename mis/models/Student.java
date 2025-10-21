@@ -1,4 +1,4 @@
-package mis.models
+package mis.models;
 
 import java.util.ArrayList;
 
