@@ -5,12 +5,12 @@ import java.util.ArrayList;
 /**
  * Represents a student in the MIS system.
  * Inherits common personal details from the abstract Person class.
- * Stores course information and GCSE-style grades (1-9)
+ * Each student is associated with a specific Course object and stores a list of GCSE-style grades (1–9).
  */
 public class Student extends Person
 {
-    // The course the student is enrolled in (e.g. Computing, Business)
-    private String course;
+    // The course the student is enrolled in
+    private Course course;
 
     // List of grades (1-9) following GCSE standards
     private ArrayList<Integer> grades = new ArrayList<>();
@@ -22,20 +22,20 @@ public class Student extends Person
      * @param email Email address
      * @param course Course name
      */
-    public Student(int id, String name, String email, String course)
+    public Student(int id, String name, String email, Course course)
     {
         super(id, name, email); // Calls the constructor of Person
         this.course = course;
     }
 
     // Getter for course
-    public String getCourse()
+    public Course getCourse()
     {
         return course;
     }
 
     // Setter for course
-    public void setCourse(String course)
+    public void setCourse(Course course)
     {
         this.course = course;
     }
@@ -79,6 +79,6 @@ public class Student extends Person
     @Override
     public String toString()
     {
-        return super.toString() + " - Course: " + course;
+        return super.toString() + " - Course: " + course.getTitle() + " (" + course.getCode() + ")";
     }
 }

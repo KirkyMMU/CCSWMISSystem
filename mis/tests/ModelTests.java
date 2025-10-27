@@ -10,8 +10,11 @@ public class ModelTests
 {
     public static void main(String[] args)
     {
-        // Create a Student object with sample data
-        Student s = new Student(1, "Alice", "alice@example.com", "Computing");
+        // Create a Course object with sample data
+        Course computing = new Course("CS101", "Computing");
+
+        // Create a Student object with the Course
+        Student s = new Student(1, "Alice", "alice@example.com", computing);
         
         // Add GCSE-style grades (1-9)
         s.addGrade(7);

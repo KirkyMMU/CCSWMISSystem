@@ -14,13 +14,19 @@ public class DataManagerTests
         // Create the central Data Manager
         DataManager manager = new DataManager();
 
+        // Create and add sample courses
+        Course computing = new Course("CS101", "Computing");
+        Course business = new Course("BUS123", "Business");
+        manager.addCourse(computing);
+        manager.addCourse(business);
+
         // Add sample students
-        Student s1 = new Student(1, "Alice", "alice@example.com", "Computing");
+        Student s1 = new Student(1, "Alice", "alice@example.com", computing);
         s1.addGrade(7);
         s1.addGrade(8);
         manager.addStudent(s1);
 
-        Student s2 = new Student(2, "Charlie", "charlie@example.com", "Business");
+        Student s2 = new Student(2, "Charlie", "charlie@example.com", business);
         s2.addGrade(6);
         manager.addStudent(s2);
 
@@ -33,10 +39,6 @@ public class DataManagerTests
         Course c2 = new Course("BUS201", "Business Fundamentals");
         manager.addCourse(c1);
         manager.addCourse(c2);
-
-        // Enrol students onto courses
-        c1.enrolStudent(1); // Enrol Alice
-        c2.enrolStudent(2); // Enrol Charlie
 
         // Display all students
         System.out.println("~~~ Students ~~~");

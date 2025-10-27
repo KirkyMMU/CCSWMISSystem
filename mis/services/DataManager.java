@@ -20,21 +20,28 @@ public class DataManager
 
     /**
      * Adds a student to the system if their ID is unique.
+     * Also updates the associated course's enrolment list, if a course is assigned.
      * @param student The Student object to add
      */
+
     public void addStudent(Student student)
     {
         if (student != null && findStudentById(student.getId()) == null)
         {
             students.add(student);
+            Course course = student.getCourse();
+            if (course != null)
+            {
+                course.enrolStudent(student.getId());
+            }
         }
     }
 
     /**
-    * Removes a student from the system by their ID.
-    * @param id The unique student ID
-    * @return true if removed successfully, false if not found
-    */
+     * Removes a student from the system by their ID.
+     * @param id The unique student ID
+     * @return true if removed successfully, false if not found
+     */
     public boolean removeStudentById(int id)
     {
         return students.removeIf(s -> s.getId() == id);
@@ -154,4 +161,22 @@ public class DataManager
     {
         return courses;
     }
+
+    /**
+     * Finds a course by its unique code.
+     * @param code The course code to search for
+     * @return The matching Course object, or null if not found
+     */
+    public Course findCourseByCode(String code)
+    {
+        for (Course c : courses)
+        {
+            if (c.getCode().equalsIgnoreCase(code))
+            {
+                return c;
+            }
+        }
+        return null;
+    }
+
 }
