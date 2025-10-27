@@ -47,7 +47,7 @@ public class Student extends Person
      */
     public void addGrade(int grade)
     {
-        if (grade >= 0 && grade <= 9)
+        if(grade >= 0 && grade <= 9)
         {
             grades.add(grade);
         }
@@ -60,12 +60,12 @@ public class Student extends Person
      */
     public double calculateAverage()
     {
-        if (grades.isEmpty())
+        if(grades.isEmpty())
         {
             return 0;
         }
         int total = 0;
-        for (int g : grades)
+        for(int g : grades)
         {
             total += g;
         }

@@ -48,7 +48,7 @@ public class Course
      */
     public void enrolStudent(int studentId)
     {
-        if (!enrolledStudentIds.contains(studentId))
+        if(!enrolledStudentIds.contains(studentId))
         {
             enrolledStudentIds.add(studentId);
         }
