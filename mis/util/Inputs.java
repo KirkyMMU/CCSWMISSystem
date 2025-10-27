@@ -22,7 +22,9 @@ public class Inputs
                 scanner.next(); // discard invalid input
                 System.out.print(prompt + " ");
             }
-            return scanner.nextInt();
+            int value = scanner.nextInt();
+            scanner.nextLine(); // consume leftover newline
+            return value;
     }
 
     /**

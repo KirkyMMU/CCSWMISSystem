@@ -24,7 +24,7 @@ public class MISSystem
         // Main Menu loop
         while(running)
         {
-            System.out.println("~~~~~ Main Menu ~~~~~");
+            System.out.println("~~~~~ Main Menu ~~~~~\n");
             System.out.println("1. Students");
             System.out.println("2. Staff");
             System.out.println("3. Courses");
@@ -34,29 +34,29 @@ public class MISSystem
         
 
             // Read user choice using validated input
-            int choice = Inputs.readInt("Choose an option (1-6):");
+            int choice = Inputs.readInt("\nChoose an option (1-6):");
 
             // Route to appropriate sub-menu or action
             switch(choice)
             {
                 case 1 -> studentMenu(manager);
-                case 2 -> System.out.println("Staff menu not implemented yet.");
-                case 3 -> System.out.println("Courses menu not implemented yet.");
-                case 4 -> System.out.println("Reports not implemented yet.");
-                case 5 -> System.out.println("Save/Load not implemented yet.");
+                case 2 -> System.out.println("\nStaff menu not implemented yet.\n");
+                case 3 -> System.out.println("\nCourses menu not implemented yet.\n");
+                case 4 -> System.out.println("\nReports not implemented yet.\n");
+                case 5 -> System.out.println("\nSave/Load not implemented yet.\n");
                 case 6 ->
                 {
                     // Confirm exit before terminating loop
-                    boolean confirmExit = Inputs.confirm("Are you sure you want to exit?");
+                    boolean confirmExit = Inputs.confirm("\nAre you sure you want to exit?");
                     if(confirmExit)
                     {
                         running = false;
                     }
                 }
-                default -> System.out.println("Invalid option. Please try again.");
+                default -> System.out.println("\nInvalid option. Please try again.");
             }
         }
-        System.out.println("Goodbye!");
+        System.out.println("\nGoodbye!");
     }
 
     /**
@@ -71,14 +71,14 @@ public class MISSystem
         System.out.println("3. Remove Student");
         System.out.println("4. Back");
 
-        int choice = Inputs.readInt("Choose an option (1-4):");
+        int choice = Inputs.readInt("\nChoose an option (1-4):");
 
         switch(choice)
         {
             case 1 -> 
             {
                 // Add Student
-                int id = Inputs.readInt("Enter Student's ID:");
+                int id = Inputs.readInt("\nEnter Student's ID:");
                 String name = Inputs.readString("Enter Student's Name:");
                 String email = Inputs.readString("Enter Student's Email:");
                 String courseId = Inputs.readString("Enter Student's Course ID:");
@@ -87,8 +87,15 @@ public class MISSystem
 
                 // Create and add student to manager
                 Student s = new Student(id, name, email, course);
-                manager.addStudent(s);
-                System.out.println("Student added successfully.");
+                boolean added = manager.addStudent(s);
+                if(added)
+                {
+                    System.out.println("\nStudent added successfully.\n");
+                }
+                else
+                {
+                    System.out.println("\nStudent ID already exists. Student not added.\n");
+                }
             }
             case 2 ->
             {
@@ -98,25 +105,25 @@ public class MISSystem
             case 3 ->
             {
                 // Remove Student
-                int removeId = Inputs.readInt("Enter Student ID to be removed:");
+                int removeId = Inputs.readInt("\nEnter Student ID to be removed:");
                 boolean removed = manager.removeStudentById(removeId);
                 if(removed)
                 {
-                    System.out.println("Student removed successfully.");
+                    System.out.println("\nStudent removed successfully.\n");
                 }
                 else
                 {
-                    System.out.println("Student not found.");
+                    System.out.println("\nStudent not found.\n");
                 }
             }
             case 4 ->
             {
                 // Return to Main Menu
-                System.out.println("Returning to main menu...");
+                System.out.println("\nReturning to main menu...\n");
             }
             default ->
             {
-                System.out.println("Invalid option.");
+                System.out.println("\nInvalid option.");
             }
         }
     }

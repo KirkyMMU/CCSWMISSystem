@@ -20,21 +20,25 @@ public class DataManager
 
     /**
      * Adds a student to the system if their ID is unique.
-     * Also updates the associated course's enrolment list, if a course is assigned.
+     * Also enrols the student in their assigned course if provided.
      * @param student The Student object to add
+     * @return true if the student was added successfully, false if the ID already exists
      */
 
-    public void addStudent(Student student)
+    public boolean addStudent(Student student)
     {
         if (student != null && findStudentById(student.getId()) == null)
         {
             students.add(student);
+            // Enrol student in their course if one is assigned
             Course course = student.getCourse();
             if (course != null)
             {
                 course.enrolStudent(student.getId());
             }
+            return true; // Student added successfully
         }
+        return false; // Duplicate ID or null student
     }
 
     /**
@@ -72,7 +76,7 @@ public class DataManager
     {
         if(students.isEmpty())
         {
-            System.out.println("No students found.");
+            System.out.println("\nNo students found.\n");
         }
         else
         {
@@ -130,7 +134,7 @@ public class DataManager
     {
         if(staffMembers.isEmpty())
         {
-            System.out.println("No staff members found.");
+            System.out.println("\nNo staff members found.\n");
         }
         else
         {
