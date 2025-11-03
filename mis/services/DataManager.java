@@ -24,7 +24,6 @@ public class DataManager
      * @param student The Student object to add
      * @return true if the student was added successfully, false if the ID already exists
      */
-
     public boolean addStudent(Student student)
     {
         if (student != null && findStudentById(student.getId()) == null)
@@ -46,10 +45,19 @@ public class DataManager
      * @param id The unique student ID
      * @return true if removed successfully, false if not found
      */
-    public boolean removeStudentById(int id)
-    {
-        return students.removeIf(s -> s.getId() == id);
-    }
+      public boolean removeStudentById(int id)
+      {
+           for(int i = 0 ; i < students.size() ; i++)
+           {
+               if(students.get(i).getId() == id)
+               {
+                   students.remove(i);
+                   return true;
+               }
+           }
+           return false;
+      }
+     
 
     /**
      * Finds a student by their unique ID.
@@ -104,10 +112,20 @@ public class DataManager
      * @param id The unique staff ID
      * @return true if removed successfully, false if not found
      */
-    public boolean removeStaffById(int id)
-    {
-        return staffMembers.removeIf(s -> s.getId() == id);
-    }
+    
+      public boolean removeStaffById(int id)
+      {
+           for(int i = 0 ; i < staffMembers.size() ; i++)
+           {
+               if(staffMembers.get(i).getId() == id)
+               {
+                   staffMembers.remove(i);
+                   return true;
+               }
+           }
+           return false;
+      }
+    
 
     /**
      * Finds a staff member by their unique ID.
