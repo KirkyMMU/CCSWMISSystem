@@ -34,12 +34,6 @@ public class DataManagerTests
         Staff st1 = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
         manager.addStaff(st1);
 
-        // Create and add courses
-        Course c1 = new Course("CS101", "Intro to Computing");
-        Course c2 = new Course("BUS201", "Business Fundamentals");
-        manager.addCourse(c1);
-        manager.addCourse(c2);
-
         // Display all students
         System.out.println("~~~ Students ~~~");
         manager.listStudents();

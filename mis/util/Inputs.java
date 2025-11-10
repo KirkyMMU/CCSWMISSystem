@@ -1,6 +1,9 @@
 package mis.util;
 
 import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 // Utility class for reading validated user input from the console.
 public class Inputs
@@ -68,6 +71,54 @@ public class Inputs
                 return false;
             }
             System.out.println("Invalid response. Please enter 'y' or 'n'.");
+        }
+    }
+
+    /**
+     * Reads a valid user-entered date in the desired format (dd/MM/yyyy).
+     * Ensures date is:
+     * - In the correct format
+     * - In the future
+     * - No more than 3 months ahead of today's date
+     * 
+     * @param prompt Message to display before reading input
+     * @return a valid LocalDate object that meets all conditions
+     */
+    public static LocalDate readValidDate(String prompt)
+    {
+        // Formatter to match expected date input
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        while(true)
+        {
+            // Prompt user for input
+            System.out.print(prompt + " (DD/MM/YYYY): ");
+            String input = scanner.nextLine().trim();
+        
+            try
+            {
+                // Attempt to parse the input using the formatter
+                LocalDate date = LocalDate.parse(input, formatter);
+
+                // Get today's date and calculate the maximum allowed date
+                LocalDate today = LocalDate.now();
+                LocalDate maxDate = today.plusMonths(3);
+
+                // Check if the date is in the future and within 3 months
+                if(date.isAfter(today) && !date.isAfter(maxDate))
+                {
+                    return date;
+                }
+                else
+                {
+                    System.out.println("Date must be in the future and within 3 months from today.");
+                }
+            }
+            catch(DateTimeParseException e)
+            {
+                // If parsing fails, inform the user and retry
+                System.out.println("Invalid format. Please enter the date as DD/MM/YYYY.");
+            }
         }
     }
 }

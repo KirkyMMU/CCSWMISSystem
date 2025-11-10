@@ -1,6 +1,7 @@
 package mis.tests;
 
 import mis.models.*;
+import java.time.LocalDate;
 
 /**
  * Simple test class for phase 2 of the MIS System to demonstrate the functionality of Student and Staff models.
@@ -31,7 +32,7 @@ public class ModelTests
         Staff st = new Staff(2, "Bob", "bob@example.com", "Lecturer", "IT");
 
         // Assign a task to the staff member
-        st.assignTask("Prepare lesson plan");
+        st.assignTask("Prepare lesson plan", LocalDate.of(2025, 11, 10));
 
         // Display staff details
         System.out.println(st);

@@ -90,7 +90,7 @@ public class DataManager
         {
             for(Student s : students)
             {
-                System.out.println(s);
+                System.out.println("\n" + s + "\n");
             }
         }
     }
@@ -98,13 +98,16 @@ public class DataManager
     /**
      * Adds a staff member to the system if their ID is unique.
      * @param staff The Staff object to add
+     * @return true if the staff was added successfully, false if the ID already exists
      */
-    public void addStaff(Staff staff)
+    public boolean addStaff(Staff staff)
     {
         if(staff != null && findStaffById(staff.getId()) == null)
         {
             staffMembers.add(staff);
+            return true; // Staff added successfully
         }
+        return false; // Duplicate ID or null value
     }
 
     /**
@@ -167,12 +170,14 @@ public class DataManager
      * Adds a course to the system.
      * @param course The Course object to add
      */
-    public void addCourse(Course course)
+    public boolean addCourse(Course course)
     {
-        if(course != null)
+        if(course != null && findCourseByCode(course.getCode()) == null)
         {
             courses.add(course);
+            return true;
         }
+        return false;
     }
 
     /**

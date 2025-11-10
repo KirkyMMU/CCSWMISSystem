@@ -45,11 +45,17 @@ public class Student extends Person
      * Accepts only valid GCSE grades (1 to 9).
      * @param grade Grade to add
      */
-    public void addGrade(int grade)
+    public boolean addGrade(int grade)
     {
-        if(grade >= 0 && grade <= 9)
+        if(grade >= 1 && grade <= 9)
         {
             grades.add(grade);
+            return true;
+        }
+        else
+        {
+            System.out.println("Invalid grade " + grade + ". Grade must be between 1 and 9");
+            return false;
         }
     }
 

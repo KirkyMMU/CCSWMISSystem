@@ -3,6 +3,7 @@ package mis.ui;
 import mis.models.*;
 import mis.services.DataManager;
 import mis.util.Inputs;
+import java.time.LocalDate;
 
 /**
  * Main entry point for the MIS System.
@@ -40,7 +41,7 @@ public class MISSystem
             switch(choice)
             {
                 case 1 -> studentMenu(manager);
-                case 2 -> System.out.println("\nStaff menu not implemented yet.\n");
+                case 2 -> staffMenu(manager);
                 case 3 -> System.out.println("\nCourses menu not implemented yet.\n");
                 case 4 -> System.out.println("\nReports not implemented yet.\n");
                 case 5 -> System.out.println("\nSave/Load not implemented yet.\n");
@@ -53,7 +54,7 @@ public class MISSystem
                         running = false;
                     }
                 }
-                default -> System.out.println("\nInvalid option. Please try again.");
+                default -> System.out.println("\nInvalid option. Please try again.\n");
             }
         }
         System.out.println("\nGoodbye!");
@@ -117,6 +118,87 @@ public class MISSystem
                 }
             }
             case 4 ->
+            {
+                // Return to Main Menu
+                System.out.println("\nReturning to main menu...\n");
+            }
+            default ->
+            {
+                System.out.println("\nInvalid option.");
+            }
+        }
+    }
+
+    private static void staffMenu(DataManager manager)
+    {
+        System.out.println("\n ----- Staff Menu -----");
+        System.out.println("1. Add Staff");
+        System.out.println("2. List Staff");
+        System.out.println("3. Assign Task");
+        System.out.println("4. Remove Staff");
+        System.out.println("5. Back");
+
+        int choice = Inputs.readInt("\nChoose an option (1-5):");
+
+        switch(choice)
+        {
+            case 1 ->
+            {
+                // Add Staff
+                int id = Inputs.readInt("\nEnter Staff ID:");
+                String name = Inputs.readString("Enter name:");
+                String email = Inputs.readString("Enter email");
+                String role = Inputs.readString("Enter role:");
+                String department = Inputs.readString("Enter department:");
+
+                Staff staff = new Staff(id, name, email, role, department);
+                boolean added = manager.addStaff(staff);
+                if(added)
+                {
+                    System.out.println("\nStaff added successfully.\n");
+                }
+                else
+                {
+                    System.out.println("\nStaff ID already exists. Staff not added.\n");
+                }
+            }
+            case 2 ->
+            {
+                // List Staff
+                manager.listStaff();
+            }
+            case 3 ->
+            {
+                // Assign Task
+                int staffId = Inputs.readInt("Enter Staff ID:");
+                Staff staff = manager.findStaffById(staffId);
+
+                if(staff != null)
+                {
+                    String task = Inputs.readString("Enter task description:");
+                    LocalDate deadline = Inputs.readValidDate("Enter task deadline:");
+                    staff.assignTask(task, deadline);
+                }
+                else
+                {
+                    System.out.println("Staff member not found.");
+                }
+            }
+            case 4 ->
+            {
+                // Remove Staff
+                int removeId = Inputs.readInt("Enter Staff ID to remove:");
+                boolean removed = manager.removeStaffById(removeId);
+                if(removed)
+                {
+                    System.out.println("\nStaff removed successfully.\n");
+                }
+                else
+                {
+                    System.out.println("\nStaff not found.\n");
+                }
+            }
+            case 5 ->
             {
                 // Return to Main Menu
                 System.out.println("\nReturning to main menu...\n");
