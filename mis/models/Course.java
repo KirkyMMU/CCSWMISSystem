@@ -60,7 +60,7 @@ public class Course
      */
     public void listEnrolled(DataManager dm)
     {
-        System.out.println("Students enrolled in: " + title + ":");
+        System.out.println("Students enrolled in " + title + ":");
         for(int id : enrolledStudentIds)
         {
             Student s = dm.findStudentById(id);
@@ -69,6 +69,11 @@ public class Course
                 System.out.println(s);
             }
         }
+    }
+
+    public void removeStudent(int studentId)
+    {
+        enrolledStudentIds.remove(Integer.valueOf(studentId));
     }
 
     /**

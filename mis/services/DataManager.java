@@ -34,6 +34,10 @@ public class DataManager
             if (course != null)
             {
                 course.enrolStudent(student.getId());
+                if(findCourseByCode(course.getCode()) == null)
+                {
+                    courses.add(course);
+                }
             }
             return true; // Student added successfully
         }
@@ -45,20 +49,26 @@ public class DataManager
      * @param id The unique student ID
      * @return true if removed successfully, false if not found
      */
-      public boolean removeStudentById(int id)
-      {
-           for(int i = 0 ; i < students.size() ; i++)
-           {
-               if(students.get(i).getId() == id)
-               {
-                   students.remove(i);
-                   return true;
-               }
-           }
-           return false;
-      }
-     
-
+    public boolean removeStudentById(int id)
+    {
+        for(int i = 0 ; i < students.size() ; i++)
+        {
+            Student s = students.get(i);
+            if(s.getId() == id)
+            {
+                // De-enrol from course if assigned
+                Course course = s.getCourse();
+                if(course != null)
+                {
+                    course.removeStudent(id);
+                }
+                students.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * Finds a student by their unique ID.
      * @param id The student ID to search for
@@ -172,10 +182,20 @@ public class DataManager
      */
     public boolean addCourse(Course course)
     {
-        if(course != null && findCourseByCode(course.getCode()) == null)
+        if(course != null)
         {
-            courses.add(course);
-            return true;
+            Course existing = findCourseByCode(course.getCode());
+            if(existing == null)
+            {
+                courses.add(course);
+                return true;
+            }
+            else
+            {
+                // If code exists, don't add duplicate
+                System.out.println("Course with code: " + course.getCode() + " already exists. Using existing course: " + existing.getTitle());
+                return false;
+            }
         }
         return false;
     }
@@ -186,7 +206,15 @@ public class DataManager
      */
     public ArrayList<Course> getCourses()
     {
-        return courses;
+        if(!courses.isEmpty())
+        {
+            return courses;
+        }
+        else
+        {
+            System.out.println("\nNo Courses found.\n");
+            return courses;
+        }
     }
 
     /**
@@ -206,4 +234,30 @@ public class DataManager
         return null;
     }
 
+    /**
+     * Removes a course from the system by its code.
+     * @param code The course code to search for
+     * @return true if removed successfully, false if not found
+     */
+    public boolean removeCourseByCode(String code)
+    {
+        for(int i = 0 ; i < courses.size() ; i++)
+        {
+            Course c = courses.get(i);
+            if(c.getCode().equalsIgnoreCase(code))
+            {
+                // Nullify course for all students enrolled
+                for(Student s : students)
+                {
+                    if(s.getCourse() != null && s.getCourse().getCode().equalsIgnoreCase(code))
+                    {
+                        s.setCourse(null);
+                    }
+                }
+                courses.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
 }

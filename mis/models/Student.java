@@ -20,14 +20,31 @@ public class Student extends Person
      * @param id Unique student ID
      * @param name Full name
      * @param email Email address
-     * @param course Course name
+     */
+    public Student(int id, String name, String email)
+    {
+        super(id, name, email); // Calls the constructor of Person
+        this.course = null; // If student doesn't have course initially
+    }
+
+    /**  
+     * Optional constructor with Course
+     * @param id Unique student ID
+     * @param name Full name
+     * @param email Email address
+     * @param course Student's course
      */
     public Student(int id, String name, String email, Course course)
     {
         super(id, name, email); // Calls the constructor of Person
+        
+        // Enrol student onto course
         this.course = course;
+        if(course != null)
+        {
+            course.enrolStudent(id);
+        }
     }
-
     // Getter for course
     public Course getCourse()
     {
@@ -37,7 +54,16 @@ public class Student extends Person
     // Setter for course
     public void setCourse(Course course)
     {
+        // De-enrol from old course if exists
+        if(this.course != null)
+        {
+            this.course.removeStudent(getId());
+        }
         this.course = course;
+        if(course != null)
+        {
+            course.enrolStudent(getId());
+        }
     }
 
     /**
@@ -85,6 +111,15 @@ public class Student extends Person
     @Override
     public String toString()
     {
-        return super.toString() + " - Course: " + course.getTitle() + " (" + course.getCode() + ")";
+        String courseInfo;
+        if(course != null)
+        {
+            courseInfo = course.getCode();
+        }
+        else
+        {
+            courseInfo = "No course assigned.";
+        }
+        return super.toString() + " | Course: " + courseInfo;
     }
 }

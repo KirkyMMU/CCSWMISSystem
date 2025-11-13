@@ -16,14 +16,20 @@ public class ModelTests
 
         // Create a Student object with the Course
         Student s = new Student(1, "Alice", "alice@example.com", computing);
+
+        // Create a Student object without a Course
+        Student sNoCourse = new Student(3, "Charles", "Charles@example.com");
         
         // Add GCSE-style grades (1-9)
         s.addGrade(7);
         s.addGrade(8);
         s.addGrade(9);
 
-        // Display student details
+        // Display student with course details
         System.out.println(s);
+
+        // Display student without course details
+        System.out.println(sNoCourse);
 
         // Display average grade
         System.out.println("Average: " + s.calculateAverage());
