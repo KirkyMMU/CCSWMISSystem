@@ -1,8 +1,8 @@
 package mis.ui;
 
 import mis.models.*;
-import mis.services.DataManager;
-import mis.util.Inputs;
+import mis.services.*;
+import mis.util.*;
 import java.time.LocalDate;
 
 /**
@@ -17,7 +17,7 @@ public class MISSystem
         // Create the central data manager to store students, staff and courses
         DataManager manager = new DataManager();
 
-        // Flag to control the main menu loop
+        // Flag to control the Main Menu loop
         boolean running = true;
 
         System.out.println("Welcome to the MIS System.\n");
@@ -40,11 +40,26 @@ public class MISSystem
             // Route to appropriate sub-menu or action
             switch(choice)
             {
-                case 1 -> studentMenu(manager);
-                case 2 -> staffMenu(manager);
-                case 3 -> courseMenu(manager);
-                case 4 -> System.out.println("\nReports not implemented yet.\n");
-                case 5 -> System.out.println("\nSave/Load not implemented yet.\n");
+                case 1 -> 
+                {
+                    studentMenu(manager);
+                }
+                case 2 -> 
+                {
+                    staffMenu(manager);
+                }
+                case 3 -> 
+                {
+                    courseMenu(manager);
+                }
+                case 4 -> 
+                {
+                    reportsMenu(manager);
+                }
+                case 5 -> 
+                {
+                    saveLoadMenu(manager);
+                }
                 case 6 ->
                 {
                     // Confirm exit before terminating loop
@@ -54,7 +69,10 @@ public class MISSystem
                         running = false;
                     }
                 }
-                default -> System.out.println("\nInvalid option. Please try again.\n");
+                default -> 
+                {
+                    System.out.println("\nInvalid option. Please try again.\n");
+                }
             }
         }
         System.out.println("\nGoodbye!");
@@ -70,7 +88,8 @@ public class MISSystem
         System.out.println("1. Add Student");
         System.out.println("2. List Students");
         System.out.println("3. Remove Student");
-        System.out.println("4. Back");
+        System.out.println("4. Add Grade to Student");
+        System.out.println("5. Back");
 
         int choice = Inputs.readInt("\nChoose an option (1-4):");
 
@@ -142,6 +161,28 @@ public class MISSystem
             }
             case 4 ->
             {
+                int studentId = Inputs.readInt("\nEnter Student ID:");
+                Student s = manager.findStudentById(studentId);
+                if(s != null)
+                {
+                    int grade = Inputs.readInt("Enter grade (1-9):");
+                    boolean added = s.addGrade(grade);
+                    if(added)
+                    {
+                        System.out.println("\nGrade added successfully.\n");
+                    }
+                    else
+                    {
+                        System.out.println("\nInvalid grade. Must be between 1 and 9.\n");
+                    }
+                }
+                else
+                {
+                    System.out.println("\nStudent not found.\n");
+                }
+            }
+            case 5 ->
+            {
                 // Return to Main Menu
                 System.out.println("\nReturning to main menu...\n");
             }
@@ -173,10 +214,10 @@ public class MISSystem
             {
                 // Add Staff
                 int id = Inputs.readInt("\nEnter Staff ID:");
-                String name = Inputs.readString("Enter name:");
-                String email = Inputs.readString("Enter email");
-                String role = Inputs.readString("Enter role:");
-                String department = Inputs.readString("Enter department:");
+                String name = Inputs.readString("Enter Name of Staff:");
+                String email = Inputs.readString("Enter Staff Email:");
+                String role = Inputs.readString("Enter Staff Role:");
+                String department = Inputs.readString("Enter Staff Department:");
 
                 Staff staff = new Staff(id, name, email, role, department);
                 boolean added = manager.addStaff(staff);
@@ -356,6 +397,66 @@ public class MISSystem
             default ->
             {
                 System.out.println("\nInvalid option.");
+            }
+        }
+    }
+
+    private static void reportsMenu(DataManager manager)
+    {
+        System.out.println("\n ----- Reports Menu -----");
+        System.out.println("1. Grades Report");
+        System.out.println("2. Attendance Report");
+        System.out.println("3. Back");
+
+        int reportChoice = Inputs.readInt("\nChoose an option (1-3):");
+        ReportManager rm = new ReportManager(manager);
+
+        switch(reportChoice)
+        {
+            case 1 ->
+            {
+                System.out.println(rm.buildGradesReport());
+            }
+            case 2 ->
+            {
+                System.out.println(rm.buildAttendanceReport());
+            }
+            case 3 ->
+            {
+                System.out.println("\nReturning to Main Menu...\n");
+            }
+            default ->
+            {
+                System.out.println("\nInvalid option.\n");
+            }
+        }
+    }
+
+    private static void saveLoadMenu(DataManager manager)
+    {
+        System.out.println("\n ----- Save/Load Menu -----");
+        System.out.println("1. Save Data");
+        System.out.println("2. Load Data");
+        System.out.println("3. Back");
+
+        int ioChoice = Inputs.readInt("\nChoose an option (1-3):");
+        switch(ioChoice)
+        {
+            case 1 ->
+            {
+                DataIO.saveToFile(manager, "mis_data.txt");
+            }
+            case 2 ->
+            {
+                DataIO.loadFromFile(manager, "mis_data.txt");
+            }
+            case 3 ->
+            {
+                System.out.println("\nReturning to main menu...\n");
+            }
+            default ->
+            {
+                System.out.println("\nInvalid option.\n");
             }
         }
     }

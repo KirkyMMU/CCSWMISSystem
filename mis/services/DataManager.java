@@ -106,6 +106,15 @@ public class DataManager
     }
 
     /**
+     * Returns the list of all students.
+     * @return array list of all student objects
+     */
+    public ArrayList<Student> getStudents()
+    {
+        return students;
+    }
+
+    /**
      * Adds a staff member to the system if their ID is unique.
      * @param staff The Staff object to add
      * @return true if the staff was added successfully, false if the ID already exists
@@ -174,6 +183,15 @@ public class DataManager
                 System.out.println(s);
             }
         }
+    }
+
+    /**
+     * Returns the list of all staff members.
+     * @return ArrayList of Staff objects
+     */
+    public ArrayList<Staff> getStaffMembers()
+    {
+        return staffMembers;
     }
 
     /**

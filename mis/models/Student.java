@@ -104,6 +104,21 @@ public class Student extends Person
         return total / (double) grades.size();
     }
 
+    public String getGradesCSV()
+    {
+        if(grades.isEmpty())
+        {
+            return "";
+        }
+        else
+        {
+            return grades.stream()
+                         .map(String::valueOf)
+                         .reduce((a, b) -> a + "," + b)
+                         .orElse("");
+        }
+    }
+
     /**
      * Returns a string representation of the student.
      * Includes inherited personal details and course info.

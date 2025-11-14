@@ -76,6 +76,21 @@ public class Course
         enrolledStudentIds.remove(Integer.valueOf(studentId));
     }
 
+    public String getEnrolledIdsCSV()
+    {
+        if(enrolledStudentIds.isEmpty())
+        {
+            return "";
+        }
+        else
+        {
+            return enrolledStudentIds.stream()
+                                     .map(String::valueOf)
+                                     .reduce((a, b) -> a + "," + b)
+                                     .orElse("");
+        }
+    }
+
     /**
      * Returns a string summary of the course.
      */
