@@ -5,16 +5,39 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-// Utility class for reading validated user input from the console.
+/**
+ * Utility class for reading validated user input from the console.
+ * 
+ * <p>Provides static helper methods to safely capture user input:
+ * <ul>
+ *   <li>{@link #readInt(String)} for integers</li>
+ *   <li>{@link #readString(String)} for non-empty strings</li>
+ *   <li>{@link #confirm(String)} for yes/no confirmations</li>
+ *   <li>{@link #readValidDate(String)} for dates in DD/MM/YYYY format</li>
+ * </ul>
+ * </p>
+ * 
+ * <p>Design notes:
+ * <ul>
+ *   <li>Uses a single shared {@link Scanner} instance bound to {@code System.in}.</li>
+ *   <li>All methods loop until valid input is provided.</li>
+ *   <li>Validation rules are explained inline for clarity.</li>
+ * </ul>
+ * </p>
+ */
 public class Inputs
     {
+        // Shared Scanner instance for reading console input.
         private static Scanner scanner = new Scanner(System.in);
 
         /**
          * Reads a valid integer from the user.
-         * Uses hasNextInt() to ensure an integer is inputted by the user.
-         * @param prompt Message to display before reading input
-         * @return Valid integer entered by the user
+         * 
+         * <p>Prompts the user with the given message then loops until a valid
+         * integer is entered. Invalid input is discarded with {@code scanner.next()}.</p>
+         * 
+         * @param prompt message to display before reading input
+         * @return valid integer entered by the user
          */
         public static int readInt(String prompt)
         {
@@ -26,14 +49,18 @@ public class Inputs
                 System.out.print(prompt + " ");
             }
             int value = scanner.nextInt();
-            scanner.nextLine(); // consume leftover newline
+            scanner.nextLine(); // consume leftover newline so next input works correctly
             return value;
     }
 
     /**
      * Reads a non-empty string from the user.
-     * @param prompt Message to display before reading input
-     * @return Trimmed, non-empty string
+     * 
+     * <p>Prompts the user with the given message then loops until a non-empty, trimmed
+     * string is entered.</p>
+     * 
+     * @param prompt message to display before reading input
+     * @return trimmed, non-empty string
      */
     public static String readString(String prompt)
     {
@@ -52,9 +79,13 @@ public class Inputs
 
     /**
      * Asks the user to confirm an action with yes/no.
-     * Accepts 'y', 'yes', 'n', or 'no' (case-insensitive).
-     * @param prompt Confirmation message
-     * @return true if confirmed, false otherwise
+     * 
+     * <p>Accepts {@code y}, {@code yes}, {@code n} or {@code no} (case-insensitive).
+     * Loops until a valid response is entered.</p>
+     * 
+     * @param prompt confirmation message
+     * @return {@code true} if confirmed,
+     *         {@code false} otherwise
      */
     public static boolean confirm(String prompt)
     {
@@ -75,14 +106,21 @@ public class Inputs
     }
 
     /**
-     * Reads a valid user-entered date in the desired format (dd/MM/yyyy).
-     * Ensures date is:
-     * - In the correct format
-     * - In the future
-     * - No more than 3 months ahead of today's date
+     * Reads a valid user-entered date in the format {@code dd/MM/yyyy}.
      * 
-     * @param prompt Message to display before reading input
-     * @return a valid LocalDate object that meets all conditions
+     * <p>Validation rules:
+     * <ul>
+     *   <li>Date must be in the correct format.</li>
+     *   <li>Date must be in the future (after today).</li>
+     *   <li>Date must not be more than 3 months ahead of today's date.</li>
+     * </ul>
+     * </p>
+     * 
+     * <p>Loops until a valid date is entered. Invalid formats or out-of-range
+     * dates trigger error messages and re-prompting.</p>
+     * 
+     * @param prompt message to display before reading input
+     * @return a valid {@link LocalDate} object that meets all conditions
      */
     public static LocalDate readValidDate(String prompt)
     {

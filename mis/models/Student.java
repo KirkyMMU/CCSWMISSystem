@@ -4,54 +4,91 @@ import java.util.ArrayList;
 
 /**
  * Represents a student in the MIS system.
- * Inherits common personal details from the abstract Person class.
- * Each student is associated with a specific Course object and stores a list of GCSE-style grades (1–9).
+ * 
+ * <p>This class extends the abstract {@link Person} class, inheriting
+ * common personal details such as ID, name and email. It adds
+ * student-specific attributes and behaviours, including:</p>
+ * <ul>
+ *   <li>Association with a {@link Course} object (the course the student
+ *       is enrolled in).</li>
+ *   <li>Storage of GCSE-style grades (integers 1-9).</li>
+ *   <li>Methods to enrol/de-enrol from courses, add grades, caluclate
+ *       averages and export grades in CSV format.</li>
+ * </ul>
+ * 
+ * <p>Design notes:
+ * <ul>
+ *   <li>Grades are stored as integers to reflect GCSE standards (1-9).</li>
+ *   <li>Course enrolment is managed bidirectionally; setting a course also
+ *       updates the course's enrolment list.</li>
+ *   <li>Validation ensures only valid grades are added.</li>
+ *   <li>Average calculation returns 0 if no grades exist allowing reports
+ *       to handle missing data gracefully.</li>
+ * </ul>
+ * </p>
  */
 public class Student extends Person
 {
-    // The course the student is enrolled in
+    // The course the student is enrolled in (null if not assigned)
     private Course course;
 
     // List of grades (1-9) following GCSE standards
     private ArrayList<Integer> grades = new ArrayList<>();
 
     /**
-     * Constructor to initialise a Student object.
-     * @param id Unique student ID
-     * @param name Full name
-     * @param email Email address
+     * Constructor to initialise a Student object without an inital course.
+     * 
+     * @param id    unique student ID
+     * @param name  full name of the student
+     * @param email email address of the student
      */
     public Student(int id, String name, String email)
     {
         super(id, name, email); // Calls the constructor of Person
-        this.course = null; // If student doesn't have course initially
+        this.course = null;     // Student may not have a course initially
     }
 
     /**  
-     * Optional constructor with Course
-     * @param id Unique student ID
-     * @param name Full name
-     * @param email Email address
-     * @param course Student's course
+     * Constructor to initialise a Student object with an initial course.
+     * 
+     * <p>If a course is provided, the student is automatically enrolled
+     * in that course.</p>
+     * 
+     * @param id     unique student ID
+     * @param name   full name of the student
+     * @param email  email address of the student
+     * @param course the course the student is enrolled in
      */
     public Student(int id, String name, String email, Course course)
     {
         super(id, name, email); // Calls the constructor of Person
         
-        // Enrol student onto course
+        // Enrol student onto course if provided
         this.course = course;
         if(course != null)
         {
             course.enrolStudent(id);
         }
     }
-    // Getter for course
+
+    /**
+     * Getter for course.
+     * 
+     * @return the course the student is enrolled in (may be null)
+     */
     public Course getCourse()
     {
         return course;
     }
 
-    // Setter for course
+    /**
+     * Setter for course.
+     * 
+     * <p>If the student was previously enrolled in another course, they
+     * are de-enrolled from that course before being added to the new one.</p>
+     * 
+     * @param course the new course to enrol the student in
+     */
     public void setCourse(Course course)
     {
         // De-enrol from old course if exists
@@ -59,6 +96,8 @@ public class Student extends Person
         {
             this.course.removeStudent(getId());
         }
+
+        // Assign new course and enrol
         this.course = course;
         if(course != null)
         {
@@ -68,8 +107,13 @@ public class Student extends Person
 
     /**
      * Adds a grade to the student's record.
-     * Accepts only valid GCSE grades (1 to 9).
-     * @param grade Grade to add
+     * 
+     * <p>Only valid GCSE grades (1-9) are accepted. Invalid grades trigger
+     * a warning message and are not added.</p>
+     * 
+     * @param grade the grade to add
+     * @return {@code true} if the grade was valid and added,
+     *         {@code false} otherwise
      */
     public boolean addGrade(int grade)
     {
@@ -86,9 +130,13 @@ public class Student extends Person
     }
 
     /**
-     * Calculates the average grade.
-     * Returns 0 if no grades are recorded.
-     * @return Average grade as a double
+     * Calculates the average grade for the student.
+     * 
+     * <p>If no grades are recorded, returns 0. This allows reports to
+     * distinguish between students with no grades and those with low 
+     * averages.</p>
+     * 
+     * @return the average grade as a double
      */
     public double calculateAverage()
     {
@@ -104,6 +152,13 @@ public class Student extends Person
         return total / (double) grades.size();
     }
 
+    /**
+     * Returns the student's grades as a comma-separated string.
+     * 
+     * <p>If no grades are recorded, returns an empty string.</p>
+     * 
+     * @return a CSV string of grades
+     */
     public String getGradesCSV()
     {
         if(grades.isEmpty())
@@ -121,7 +176,11 @@ public class Student extends Person
 
     /**
      * Returns a string representation of the student.
-     * Includes inherited personal details and course info.
+     * 
+     * <p>Includes inherited personal details (Id, name, email) and 
+     * course information (course code or "No course assigned").</p>
+     * 
+     * @return a formatted string summarising the student
      */
     @Override
     public String toString()

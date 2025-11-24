@@ -5,9 +5,24 @@ import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Represents a staff member in the MIS system.
- * Inherits common personal details from the abstract Person class.
- * Stores role and department information specific to staff.
+ * Represents a staff member in the MIS System.
+ * 
+ * <p>This class extends the abstract {@link Person} class, inheriting 
+ * common personal attributes such as ID, name and email. It adds staff-specific
+ * attributes like role and department and provides functionality for
+ * assigning tasks with deadlines.</p>
+ * 
+ * <p>Design notes:
+ * <ul>
+ *   <li>Encapsulates staff metadata (role, department) to distinguish staff
+ *       from students.</li>
+ *   <li>Includes task assignment logic with deadline vaidation to ensure
+ *       realistic scheduling.</li>
+ *   <li>Uses Java's {@link java.time} API for date handling and formatting.</li>
+ *   <li>Overrides {@code toString()} to provide a comprehensive summary 
+ *       including inherited details and staff-specific information.</li>
+ * </ul>
+ * </p>
  */
 public class Staff extends Person
 {
@@ -19,11 +34,12 @@ public class Staff extends Person
 
     /**
      * Constructor to initialise a Staff object.
-     * @param id Unique staff ID
-     * @param name Full name
-     * @param email Email address
-     * @param role Job title
-     * @param department Department name
+     * 
+     * @param id         unique staff ID
+     * @param name       full name of the staff member
+     * @param email      email address of the staff member
+     * @param role       job title or role
+     * @param department department name
      */
     public Staff(int id, String name, String email, String role, String department)
     {
@@ -32,38 +48,64 @@ public class Staff extends Person
         this.department = department;
     }
 
-    // Getter for role
+    /** 
+     * Getter for role.
+     * 
+     * @return the job title or role of the staff member
+     */
     public String getRole()
     {
         return role;
     }
 
-    // Getter for department
+    /**
+     * Getter for department.
+     * 
+     * @return the department name that relates to the staff member
+     */
     public String getDepartment()
     {
         return department;
     }
 
-    // Setter for role
+    /**
+     * Setter for role.
+     * 
+     * @param role the job title or role to set for the staff member
+     */
     public void setRole(String role)
     {
         this.role = role;
     }
 
-    // Setter for department
+    /**
+     * Setter for department.
+     * 
+     * @param department the department name to set for the staff member
+     */
     public void setDepartment(String department)
     {
         this.department = department;
     }
 
-    // The current task assigned to the staff member.
+    // The current task assigned to the staff member, including deadline information.
     private String currentTask;
 
     /**
-     * Assigns a task to the staff member.
-     * Outputs a message to the console with the task assigned to the staff member and the deadline for completion.
-     * Uses several imported date related libraries to ensure desired date format is returned.
-     * @param task Description of the task
+     * Assigns a task to the staff member with a deadline.
+     * 
+     * <p>This method validates the deadline to ensure it is:
+     * <ul>
+     *   <li>In the future (not today or past dates).</li>
+     *   <li>Within 90 days (approx. 3 months) from the current date.</li>
+     * </ul>
+     * If validation fails, an error message is printed and no task is assigned.</p>
+     * 
+     * <p>On success, the task is stored with a formatted deadline and a confirmation
+     * message is printed to the console.</p>
+     * 
+     * @param task     description of the task
+     * @param deadline deadline date for task completion
      */
     public void assignTask(String task, LocalDate deadline)
     {
@@ -77,7 +119,7 @@ public class Staff extends Person
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String formattedDate = deadline.format(formatter);
 
-        // if statements to check whether deadline date is in desired range
+        // Validate deadline range
         if(daysBetween <= 0)
         {
             System.out.println("Deadline must be in the future.");
@@ -88,13 +130,24 @@ public class Staff extends Person
             System.out.println("Deadline can not be more than 3 months from today.");
             return;
         }
+
+        // Assign task with formatted deadline
         currentTask = task + " (Deadline: " + formattedDate + ")";
         System.out.println(getName() + " assigned to: " + currentTask);
     }
 
     /**
      * Returns a string representation of the staff member.
-     * Includes inherited personal details, role, department and current assigned task ("None" if no task assigned).
+     * 
+     * <p>Includes:
+     * <ul>
+     *   <li>Inherited personal details (ID, name, email).</li>
+     *   <li>Role and department information.</li>
+     *   <li>Current assigned task or "None" if no task is assigned.</li>
+     * </ul>
+     * </p>
+     * 
+     * @return a formatted string summarising the staff member
      */
     @Override
     public String toString()

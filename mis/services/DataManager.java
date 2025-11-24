@@ -5,7 +5,21 @@ import java.util.ArrayList;
 
 /**
  * Service class responsible for managing collections of students, staff and courses.
- * Provides methods to add, remove, list and search entities in the MIS System.
+ * 
+ * <p>The DataManager acts as the central hub of the MIS system, providing methods to
+ * add, remove, list and search for entities. It ensures consistency across relationships
+ * (e.g. students enrolled in courses) and enforces uniqueness of IDs.</p>
+ * 
+ * <p>Design notes:
+ * <ul>
+ *   <li>Maintains in-memory collections of {@link Student}, {@link Staff} and
+ *       {@link Course} objects.</li>
+ *   <li>Provides utility methods for CRUD operations (create, read, update, delete).</li>
+ *   <li>Ensures referential integrity; when students are added/removed, their course
+ *       enrolements are updated accordingly.</li>
+ *   <li>Intended as a lightweight service layer without persistent storage.</li>
+ * </ul>
+ * </p>
  */
 public class DataManager
 {
@@ -20,9 +34,19 @@ public class DataManager
 
     /**
      * Adds a student to the system if their ID is unique.
-     * Also enrols the student in their assigned course if provided.
-     * @param student The Student object to add
-     * @return true if the student was added successfully, false if the ID already exists
+     * 
+     * <p>Behaviour:
+     * <ul>
+     *   <li>Checks for duplicate IDs before adding.</li>
+     *   <li>If the student has a course assigned, enrols them in that course.</li>
+     *   <li>If the course is not already tracked by DataManager, adds it to the course
+     *       list.</li>
+     * </ul>
+     * </p>
+     * 
+     * @param student the Student object to add
+     * @return {@code true} if the student was added successfully,
+     *         {@code false} if the ID already exists or the student is null
      */
     public boolean addStudent(Student student)
     {
@@ -34,6 +58,8 @@ public class DataManager
             if (course != null)
             {
                 course.enrolStudent(student.getId());
+
+                // Ensure course is tracked in the system
                 if(findCourseByCode(course.getCode()) == null)
                 {
                     courses.add(course);
@@ -46,8 +72,18 @@ public class DataManager
 
     /**
      * Removes a student from the system by their ID.
-     * @param id The unique student ID
-     * @return true if removed successfully, false if not found
+     * 
+     * <p>Behaviour:
+     * <ul>
+     *   <li>Searches for the student by ID.</li>
+     *   <li>If found, de-enrols them from their course (if assigned).</li>
+     *   <li>Removes the student from the internal list.</li>
+     * </ul>
+     * </p>
+     * 
+     * @param id the unique student ID
+     * @return {@code true} if the student was removed successfully,
+     *         {@code false} if no student with the given ID was found
      */
     public boolean removeStudentById(int id)
     {
@@ -71,8 +107,9 @@ public class DataManager
     
     /**
      * Finds a student by their unique ID.
-     * @param id The student ID to search for
-     * @return The matching Student object, or null if not found
+     * 
+     * @param id the student ID to search for
+     * @return the matching Student object or {@code null} if not found
      */
     public Student findStudentById(int id)
     {
@@ -88,7 +125,10 @@ public class DataManager
 
     /**
      * Lists all students currently in the system.
-     * Outputs to the console.
+     * 
+     * <p>Outputs each student's details to the console using their
+     * {@code toString()} representation. If no students exist, prints a message
+     * indicating the list is empty.</p>
      */
     public void listStudents()
     {
@@ -107,7 +147,11 @@ public class DataManager
 
     /**
      * Returns the list of all students.
-     * @return array list of all student objects
+     * 
+     * <p>Note: This returns the internal list directly. External code should
+     * avoid modifying it directly to maintain data integrity.</p>
+     * 
+     * @return an {@link ArrayList} of all student objects
      */
     public ArrayList<Student> getStudents()
     {
@@ -116,8 +160,18 @@ public class DataManager
 
     /**
      * Adds a staff member to the system if their ID is unique.
-     * @param staff The Staff object to add
-     * @return true if the staff was added successfully, false if the ID already exists
+     * 
+     * <p>Behaviour:
+     * <ul>
+     *   <li>Checks for duplicate IDs before adding.</li>
+     *   <li>Null values are rejected to prevent invalid entries.</li>
+     *   <li>If successful, the staff member is added to the internal list.</li>
+     * </ul>
+     * </p>
+     * 
+     * @param staff the Staff object to add
+     * @return {@code true} if the staff member was added successfully,
+     *         {@code false} if the ID already exists or the staff is null
      */
     public boolean addStaff(Staff staff)
     {
@@ -131,10 +185,19 @@ public class DataManager
 
     /**
      * Removes a staff member from the system by their ID.
-     * @param id The unique staff ID
-     * @return true if removed successfully, false if not found
+     * 
+     * <p>Behaviour:
+     * <ul>
+     *   <li>Iterates through the staff list to find a matching ID.</li>
+     *   <li>If found, removes the staff member from the internal list.</li>
+     *   <li>If not found, returns false.</li>
+     * </ul>
+     * </p>
+     * 
+     * @param id the unique staff ID
+     * @return {@code true} if the staff member was removed successfully,
+     *         {@code false} if no staff member with the given ID was found
      */
-    
       public boolean removeStaffById(int id)
       {
            for(int i = 0 ; i < staffMembers.size() ; i++)
@@ -151,8 +214,9 @@ public class DataManager
 
     /**
      * Finds a staff member by their unique ID.
-     * @param id The staff ID to search for
-     * @return The matching Staff object, or null if not found
+     * 
+     * @param id the staff ID to search for
+     * @return the matching Staff object or {@code null} if not found
      */
     public Staff findStaffById(int id)
     {
@@ -168,7 +232,10 @@ public class DataManager
 
     /**
      * Lists all staff members currently in the system.
-     * Outputs to the console.
+     * 
+     * <p>Outputs each staff member's details to the console using their
+     * {@code toString()} representation. If no staff exist, prints a message
+     * indicating the list is empty.</p>
      */
     public void listStaff()
     {
@@ -187,7 +254,11 @@ public class DataManager
 
     /**
      * Returns the list of all staff members.
-     * @return ArrayList of Staff objects
+     * 
+     * <p>Note: This returns the internal list directly. External code should
+     * avoid modifying it directly to maintain data integrity.</p>
+     * 
+     * @return an {@link ArrayList} of all staff objects
      */
     public ArrayList<Staff> getStaffMembers()
     {
@@ -196,7 +267,21 @@ public class DataManager
 
     /**
      * Adds a course to the system.
-     * @param course The Course object to add
+     * 
+     * <p>Behaviour:
+     * <ul>
+     *   <li>Checks for null values to prevent invalid entries.</li>
+     *   <li>Ensures uniqueness of course codes (case-insensitive).</li>
+     *   <li>If a course with the same code already exists, rejects the new 
+     *       course and prints a message indicating the existing course is used
+     *       instead.</li>
+     *   <li>If unique, adds the course to the internal list.</li>
+     * </ul>
+     * </p>
+     * 
+     * @param course the Course object to add
+     * @return {@code true} if the course was added successfully,
+     *         {@code false} if the course is null or a duplicate
      */
     public boolean addCourse(Course course)
     {
@@ -220,7 +305,11 @@ public class DataManager
 
     /**
      * Returns the list of all courses.
-     * @return ArrayList of Course objects
+     * 
+     * <p>If no courses exist, prints a message to the console and returns
+     * the empty list.</p>
+     * 
+     * @return an {@link ArrayList} of all Course objects
      */
     public ArrayList<Course> getCourses()
     {
@@ -237,8 +326,11 @@ public class DataManager
 
     /**
      * Finds a course by its unique code.
-     * @param code The course code to search for
-     * @return The matching Course object, or null if not found
+     * 
+     * <p>Search is case-insensitive.</p>
+     * 
+     * @param code the course code to search for
+     * @return the matching Course object or {@code null} if not found
      */
     public Course findCourseByCode(String code)
     {
@@ -254,8 +346,20 @@ public class DataManager
 
     /**
      * Removes a course from the system by its code.
-     * @param code The course code to search for
-     * @return true if removed successfully, false if not found
+     * 
+     * <p>Behaviour:
+     * <ul>
+     *   <li>Searches for the course by code (case-insensitive).</li>
+     *   <li>If found, removes the course from the internal list.</li>
+     *   <li>Before removal, iterates through all the students and nullifies
+     *       their course reference if they were enrolled in the removed course.</li>
+     *   <li>If not found, returns false.</li>
+     * </ul>
+     * </p>
+     * 
+     * @param code the course code to search for
+     * @return {@code true} if the course was removed successfully,
+     *         {@code false} if no course with the given code was found
      */
     public boolean removeCourseByCode(String code)
     {
@@ -264,7 +368,7 @@ public class DataManager
             Course c = courses.get(i);
             if(c.getCode().equalsIgnoreCase(code))
             {
-                // Nullify course for all students enrolled
+                // Nullify course for all students enrolled in this course
                 for(Student s : students)
                 {
                     if(s.getCourse() != null && s.getCourse().getCode().equalsIgnoreCase(code))

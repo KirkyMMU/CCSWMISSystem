@@ -5,7 +5,24 @@ import java.util.ArrayList;
 
 /**
  * Represents a course in the MIS System.
- * Tracks enrolled student IDs and provides listing functionality.
+ * 
+ * <p>A Course object encapsulates the unique code and title of a course,
+ * along with a list of student IDs enrolled in it. This class provides
+ * methods to enrol and remove students, list enrolled students and generate
+ * a summary string representation.</p>
+ * 
+ * <p>Design notes:
+ * <ul>
+ *   <li>Students are tracked by their unique IDs rather than direct references,
+ *       which simplifies persistence and avoids circular dependencies.</li>
+ *   <li>The {@link DataManager} can be used to resolve student IDs into
+ *       full {@link Student} objects when listing enrolments.</li>
+ *   <li>Duplicate enrolments are prevented by checking the ID list before adding 
+ *       a new student.</li>
+ *   <li>The class provides a CSV export of enrolled IDs for use in reports or 
+ *       persistence.</li>
+ * </ul>
+ * </p>
  */
 public class Course
 {
@@ -20,8 +37,9 @@ public class Course
 
     /**
      * Constructor to initialise a Course object.
-     * @param code Unique course code
-     * @param title Course title
+     * 
+     * @param code unique course code
+     * @param title course title
      */
     public Course(String code, String title)
     {
@@ -29,13 +47,21 @@ public class Course
         this.title = title;
     }
 
-    // Getter for course code
+    /**
+     * Getter for course code.
+     * 
+     * @return the course code string
+     */
     public String getCode()
     {
         return code;
     }
 
-    // Getter for course title
+    /**
+     * Getter for course title.
+     * 
+     * @return the course title string 
+     */
     public String getTitle()
     {
         return title;
@@ -43,8 +69,11 @@ public class Course
 
     /**
      * Enrols a student by their ID.
-     * Prevents duplicate enrolment
-     * @param studentId ID of the student to enrol
+     * 
+     * <p>If the student is already enrolled, this method does nothing.
+     * This prevents duplicate entries in the enrolment list.</p>
+     * 
+     * @param studentId the unique ID of the student to enrol
      */
     public void enrolStudent(int studentId)
     {
@@ -55,15 +84,19 @@ public class Course
     }
 
     /**
-     * Lists all enrolled students using the DataManager to resolve IDs.
-     * @param dm Reference to the DataManager for student lookup
+     * Lists all enrolled students by resolving their IDs via the DataManager.
+     * 
+     * <p>This method prints each enrolled student's details to the console.
+     * If a student ID cannot be resolved (e.g. student removed), it is skipped.</p>
+     * 
+     * @param manager the DataManager instance used to look up Student objects
      */
-    public void listEnrolled(DataManager dm)
+    public void listEnrolled(DataManager manager)
     {
         System.out.println("Students enrolled in " + title + ":");
         for(int id : enrolledStudentIds)
         {
-            Student s = dm.findStudentById(id);
+            Student s = manager.findStudentById(id);
             if(s != null)
             {
                 System.out.println(s);
@@ -71,11 +104,23 @@ public class Course
         }
     }
 
+    /**
+     * Removes a student from the course by their ID.
+     * 
+     * @param studentId the unique ID of the student to remove
+     */
     public void removeStudent(int studentId)
     {
         enrolledStudentIds.remove(Integer.valueOf(studentId));
     }
 
+    /**
+     * Returns a comma-separated string of enrolled student IDs.
+     * 
+     * <p>If no students are enrolled, an empty string is returned.</p>
+     * 
+     * @return a CSV string of enrolled student IDs
+     */
     public String getEnrolledIdsCSV()
     {
         if(enrolledStudentIds.isEmpty())
@@ -92,7 +137,10 @@ public class Course
     }
 
     /**
-     * Returns a string summary of the course.
+     * Returns a string summary of the course including code, title and
+     * the number of enrolled students.
+     * 
+     * @return a formatted string summarising the course
      */
     @Override
     public String toString()
