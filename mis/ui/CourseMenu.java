@@ -36,7 +36,7 @@ public class CourseMenu
     // Displays the course menu and routes user choices to appropriate actions.
     public void show()
     {
-        System.out.println("\n ----- Course Menu -----");
+        System.out.println("\n ----- Course Menu -----\n");
         System.out.println("1. List Courses");
         System.out.println("2. Add New Course");
         System.out.println("3. Enrol Student Onto Course");
@@ -45,7 +45,7 @@ public class CourseMenu
         System.out.println("6. Remove Course");
         System.out.println("7. Back");
 
-        int choice = Inputs.readInt("Choose an option (1-7):");
+        int choice = Inputs.readInt("\nChoose an option (1-7):");
 
         switch(choice)
         {
@@ -55,8 +55,8 @@ public class CourseMenu
             case 4 -> listStudentsInCourse();
             case 5 -> searchCourse();
             case 6 -> removeCourse();
-            case 7 -> System.out.println("\nReturning to Main Menu...\n");
-            default -> System.out.println("\nInvalid option.\n");
+            case 7 -> System.out.println("\nReturning to Main Menu...");
+            default -> System.out.println("\nInvalid option.");
         }
     }
 
@@ -78,7 +78,7 @@ public class CourseMenu
      */
     private void addCourse()
     {
-        String code = Inputs.readString("Enter the new Course Code:");
+        String code = Inputs.readString("\nEnter the new Course Code:");
         String title = Inputs.readString("Enter the new Course Title:");
 
         Course course = new Course(code, title);
@@ -86,11 +86,11 @@ public class CourseMenu
 
         if(added)
         {
-            System.out.println("\nCourse added successfully.\n");
+            System.out.println("\nCourse added successfully.");
         }
         else
         {
-            System.out.println("\nCourse Code already exists. Course not added.\n");
+            System.out.println("\nCourse Code already exists. Course not added.");
         }
     }
 
@@ -103,7 +103,7 @@ public class CourseMenu
      */
     private void enrolStudent()
     {
-        String code = Inputs.readString("Enter the Course Code:");
+        String code = Inputs.readString("\nEnter the Course Code:");
         Course course = manager.findCourseByCode(code);
 
         if(course != null)
@@ -114,11 +114,11 @@ public class CourseMenu
             if(student != null)
             {
                 student.setCourse(course);
-                System.out.println("\nStudent enrolled successfully.\n");
+                System.out.println("\nStudent enrolled successfully.");
             }
             else
             {
-                System.out.println("\nStudent ID not found.\n");
+                System.out.println("\nStudent ID not found.");
             }
         }
         else
@@ -135,7 +135,7 @@ public class CourseMenu
      */
     private void listStudentsInCourse()
     {
-        String code = Inputs.readString("Enter the Course Code:");
+        String code = Inputs.readString("\nEnter the Course Code:");
         Course course = manager.findCourseByCode(code);
 
         if(course != null)
@@ -144,7 +144,7 @@ public class CourseMenu
         }
         else
         {
-            System.out.println("\nCourse not found.\n");
+            System.out.println("\nCourse not found.");
         }
     }
 
@@ -156,7 +156,7 @@ public class CourseMenu
      */
     private void searchCourse()
     {
-        String code = Inputs.readString("Enter the Course Code:");
+        String code = Inputs.readString("\nEnter the Course Code:");
         Course course = manager.findCourseByCode(code);
 
         if(course != null)
@@ -165,7 +165,7 @@ public class CourseMenu
         }
         else
         {
-            System.out.println("\nCourse not found.\n");
+            System.out.println("\nCourse not found.");
         }
     }
 
@@ -178,16 +178,16 @@ public class CourseMenu
      */
     private void removeCourse()
     {
-        String code = Inputs.readString("Enter Course Code to remove:");
+        String code = Inputs.readString("\nEnter Course Code to remove:");
         boolean removed = manager.removeCourseByCode(code);
 
         if(removed)
         {
-            System.out.println("\nCourse removed successfully.\n");
+            System.out.println("\nCourse removed successfully.");
         }
         else
         {
-            System.out.println("\nCourse not found.\n");
+            System.out.println("\nCourse not found.");
         }
     }
 }

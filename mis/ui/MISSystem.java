@@ -33,7 +33,7 @@ public class MISSystem
         boolean running = true;
 
         // Display a welcome message at startup.
-        System.out.println("Welcome to the MIS System.\n");
+        System.out.println("\nWelcome to the MIS System.");
 
         // Create the Main Menu, passing in the shared DataManager.
         MainMenu menu = new MainMenu(manager);
@@ -47,6 +47,6 @@ public class MISSystem
         }
         
         // Display a goodbye message after the loop ends.
-        System.out.println("\nGoodbye!");
+        System.out.println("\nGoodbye!\n");
     }
 }

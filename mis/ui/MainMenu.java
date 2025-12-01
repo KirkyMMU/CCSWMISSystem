@@ -41,7 +41,7 @@ public class MainMenu
      */
     public boolean show()
     {
-        System.out.println("~~~~~ Main Menu ~~~~~\n");
+        System.out.println("\n ~~~~~ Main Menu ~~~~~\n");
         System.out.println("1. Students");
         System.out.println("2. Staff");
         System.out.println("3. Courses");
@@ -67,7 +67,7 @@ public class MainMenu
                     return false; // signal to stop
                 }
             }
-            default -> System.out.println("\nInvalid option. Please try again.\n");
+            default -> System.out.println("\nInvalid option. Please try again.");
         }
         return true; // keep running by default
     }

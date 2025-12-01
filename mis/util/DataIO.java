@@ -80,11 +80,11 @@ public class DataIO
                 writer.println("COURSE|" + course.getCode() + "|" + course.getTitle() + "|" + enrolled);
             }
 
-            System.out.println("\nData saved successfully to " + path + "\n");
+            System.out.println("\nData saved successfully to " + path);
         }
         catch(IOException error)
         {
-            System.out.println("Error saving data: " + error.getMessage());
+            System.out.println("\nError saving data: " + error.getMessage());
         }
     }
 
@@ -176,11 +176,11 @@ public class DataIO
                     } // case "COURSE"
                 } // switch
             } // while
-            System.out.println("\nData loaded successfully from " + path + "\n");
+            System.out.println("\nData loaded successfully from " + path);
         } // try
         catch(IOException error)
         {
-            System.out.println("Error loading data: " + error.getMessage());
+            System.out.println("\nError loading data: " + error.getMessage());
         }
     }
 }

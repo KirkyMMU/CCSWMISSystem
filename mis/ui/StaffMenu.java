@@ -37,14 +37,14 @@ public class StaffMenu
     // Displays the staff menu and routes user choices to appropriate actions
     public void show()
     {
-        System.out.println("\n----- Staff Menu -----");
+        System.out.println("\n ----- Staff Menu -----\n");
         System.out.println("1. Add Staff");
         System.out.println("2. List Staff");
         System.out.println("3. Assign Task");
         System.out.println("4. Remove Staff");
         System.out.println("5. Back");
 
-        int choice = Inputs.readInt("Choose an option (1-5):");
+        int choice = Inputs.readInt("\nChoose an option (1-5):");
 
         switch(choice)
         {
@@ -52,8 +52,8 @@ public class StaffMenu
             case 2 -> manager.listStaff();
             case 3 -> assignTask();
             case 4 -> removeStaff();
-            case 5 -> System.out.println("\nReturning to Main Menu...\n");
-            default -> System.out.println("\nInvalid option.\n");
+            case 5 -> System.out.println("\nReturning to Main Menu...");
+            default -> System.out.println("\nInvalid option.");
         }
     }
 
@@ -66,7 +66,7 @@ public class StaffMenu
      */
     private void addStaff()
     {
-        int id = Inputs.readInt("Enter Staff ID:");
+        int id = Inputs.readInt("\nEnter Staff ID:");
         String name = Inputs.readString("Enter Staff Name:");
         String email = Inputs.readString("Enter Staff Email:");
         String role = Inputs.readString("Enter Staff Role:");
@@ -76,11 +76,11 @@ public class StaffMenu
         boolean added = manager.addStaff(staff);
         if(added)
         {
-            System.out.println("\nStaff added successfully.\n");
+            System.out.println("\nStaff added successfully.");
         }
         else
         {
-            System.out.println("\nStaff ID already exists. Staff not added.\n");
+            System.out.println("\nStaff ID already exists. Staff not added.");
         }
     }
 
@@ -93,7 +93,7 @@ public class StaffMenu
      */
     private void assignTask()
     {
-        int staffId = Inputs.readInt("Enter Staff ID:");
+        int staffId = Inputs.readInt("\nEnter Staff ID:");
         Staff staff = manager.findStaffById(staffId);
 
         if (staff != null) 
@@ -101,11 +101,11 @@ public class StaffMenu
             String task = Inputs.readString("Enter task description:");
             LocalDate deadline = Inputs.readValidDate("Enter task deadline:");
             staff.assignTask(task, deadline);
-            System.out.println("\nTask assigned.\n");
+            System.out.println("\nTask assigned.");
         } 
         else 
         {
-            System.out.println("\nStaff member not found.\n");
+            System.out.println("\nStaff member not found.");
         }
     }
     
@@ -118,16 +118,16 @@ public class StaffMenu
      */
     private void removeStaff()
     {
-        int id = Inputs.readInt("Enter Staff ID to remove:");
+        int id = Inputs.readInt("\nEnter Staff ID to remove:");
         boolean removed = manager.removeStaffById(id);
 
         if(removed)
         {
-            System.out.println("\nStaff removed successfully.\n");
+            System.out.println("\nStaff removed successfully.");
         }
         else
         {
-            System.out.println("\nStaff not found.\n");
+            System.out.println("\nStaff not found.");
         }
     }
 }

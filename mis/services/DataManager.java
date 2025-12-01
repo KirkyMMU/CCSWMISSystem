@@ -140,7 +140,7 @@ public class DataManager
         {
             for(Student student : students)
             {
-                System.out.println("\n" + student + "\n");
+                System.out.println("\n" + student);
             }
         }
     }
@@ -247,7 +247,7 @@ public class DataManager
         {
             for(Staff staff : staffMembers)
             {
-                System.out.println(staff);
+                System.out.println("\n" + staff);
             }
         }
     }

@@ -150,7 +150,7 @@ public class Student extends Person
         }
         else
         {
-            System.out.println("Invalid grade " + grade + ". Grade must be between 1 and 9");
+            System.out.println("\nInvalid grade \"" + grade + "\". Grade must be between 1 and 9.\nGrade not added.");
             return false;
         }
     }

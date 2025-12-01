@@ -35,12 +35,12 @@ public class ReportsMenu
     // Displays the reports menu and routes user choices to appropriate actions
     public void show()
     {
-        System.out.println("\n ----- Reports Menu -----");
+        System.out.println("\n ----- Reports Menu -----\n");
         System.out.println("1. Grades Report");
         System.out.println("2. Attendance Report");
         System.out.println("3. Back");
 
-        int choice = Inputs.readInt("Choose an option (1-3):");
+        int choice = Inputs.readInt("\nChoose an option (1-3):");
 
         // Create a ReportManager for generating reports
         ReportManager reportManager = new ReportManager(manager);
@@ -49,8 +49,8 @@ public class ReportsMenu
         {
             case 1 -> System.out.println(reportManager.buildGradesReport());
             case 2 -> System.out.println(reportManager.buildAttendanceReport());
-            case 3 -> System.out.println("\nReturning to Main Menu...\n");
-            default -> System.out.println("\nInvalid option.\n");
+            case 3 -> System.out.println("\nReturning to Main Menu...");
+            default -> System.out.println("\nInvalid option.");
         }
     }
 }

@@ -36,14 +36,14 @@ public class StudentMenu
     // Displays the student menu and routes user choices to appropriate actions
     public void show()
     {
-        System.out.println("\n----- Student Menu -----");
+        System.out.println("\n ----- Student Menu -----\n");
         System.out.println("1. Add Student");
         System.out.println("2. List Students");
         System.out.println("3. Remove Student");
         System.out.println("4. Add Grade to Student");
         System.out.println("5. Back");
 
-        int choice = Inputs.readInt("Choose an option (1-5):");
+        int choice = Inputs.readInt("\nChoose an option (1-5):");
 
         switch(choice)
         {
@@ -51,7 +51,7 @@ public class StudentMenu
             case 2 -> manager.listStudents();
             case 3 -> removeStudent();
             case 4 -> addGrade();
-            case 5 -> System.out.println("\nReturning to Main Menu...\n");
+            case 5 -> System.out.println("\nReturning to Main Menu...");
             default -> System.out.println("\nInvalid option.");
         }
     }
@@ -69,7 +69,7 @@ public class StudentMenu
      */
     private void addStudent()
     {
-        int id = Inputs.readInt("Enter Student ID:");
+        int id = Inputs.readInt("\nEnter Student ID:");
         String name = Inputs.readString("Enter Student Name:");
         String email = Inputs.readString("Enter Student Email:");
         boolean assignCourse = Inputs.confirm("\nDo you want to enrol student onto a course now?");
@@ -87,7 +87,7 @@ public class StudentMenu
             {
                 // Re-use existing course, ignore new title
                 student = new Student(id, name, email, existingCourse);
-                System.out.println("\nCourse code already exists. Student enrolled onto existing course: " + existingCourse.getTitle());
+                System.out.println("\nCourse code already exists. If student is added,\nstudent will be enrolled onto existing course: " + existingCourse.getTitle());
             }
             else
             {
@@ -95,7 +95,7 @@ public class StudentMenu
                 Course newCourse = new Course(courseCode, courseTitle);
                 manager.addCourse(newCourse);
                 student = new Student(id, name, email, newCourse);
-                System.out.println("\nNew course created and student enrolled.\n");
+                System.out.println("\nNew course created and student enrolled.");
             }
         }
         else
@@ -122,16 +122,16 @@ public class StudentMenu
      */
     private void removeStudent()
     {
-        int id = Inputs.readInt("Enter Student ID to remove:");
+        int id = Inputs.readInt("\nEnter Student ID to remove:");
 
         boolean removed = manager.removeStudentById(id);
         if(removed)
         {
-            System.out.println("\nStudent removed successfully.\n");
+            System.out.println("\nStudent removed successfully.");
         }
         else
         {
-            System.out.println("\nStudent not found.\n");
+            System.out.println("\nStudent not found.");
         }
     }
 
@@ -144,7 +144,7 @@ public class StudentMenu
      */
     private void addGrade()
     {
-        int id = Inputs.readInt("Enter Student ID:");
+        int id = Inputs.readInt("\nEnter Student ID:");
         Student student = manager.findStudentById(id);
         if(student != null)
         {
@@ -153,16 +153,12 @@ public class StudentMenu
             boolean added = student.addGrade(grade);
             if(added)
             {
-                System.out.println("\nGrade added successfully.\n");
-            }
-            else
-            {
-               System.out.println("\nInvalid grade.\n");
+                System.out.println("\nGrade added successfully.");
             }
         }
         else
         {
-            System.out.println("\nStudent not found.\n");
+            System.out.println("\nStudent not found.");
         }
     }
 }
