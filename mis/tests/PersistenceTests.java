@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
  * 
  * <p>These tests verify that data managed by {@link DataManager} can be
  * saved to a file and subsequently reloaded correctly, ensuring that
- * student information and grades are preserved across sessions.</p>
+ * student information and student data are both preserved across sessions.</p>
  * 
  * <p>Design notes:
  * <ul>
  *   <li>Uses a temporary test file ("test_data.txt") for persistence checks.</li>
  *   <li>Validates both structural persistence (student exists after reload) and
- *       data integrity (grades are preserved).</li>
+ *       data integrity (grades and attendance percentages are preserved).</li>
  *   <li>Includes cleanup logic to remove the test file after all tests run
  *       preventing pollution of the working directory.</li>
  * </ul>
@@ -37,6 +37,7 @@ public class PersistenceTests
      *   <li>Create a fresh DataManager and load the state from the file.</li>
      *   <li>Assert that the student exists in the reloaded manager.</li>
      *   <li>Assert that the student's average grade is preserved.</li>
+     *   <li>Assert that the student's percentage attendance is preserved.</li>
      * </ol>
      * </p>
      */
@@ -45,9 +46,10 @@ public class PersistenceTests
     {
         // Create initial manager and add a student with a grade
         DataManager manager = new DataManager();
-        Student s = new Student(1, "Alice", "alice@example.com");
-        s.addGrade(7);
-        manager.addStudent(s);
+        Student student = new Student(1, "Alice", "alice@example.com");
+        student.addGrade(7);
+        student.setAttendancePercentage(95.2);
+        manager.addStudent(student);
 
         // Save state to file
         DataIO.saveToFile(manager, TEST_FILE);
@@ -56,9 +58,10 @@ public class PersistenceTests
         DataManager manager2 = new DataManager();
         DataIO.loadFromFile(manager2, TEST_FILE);
 
-        // Verify student exists and grade data is preserved
+        // Verify student exists and grade and attendance data is preserved
         assertNotNull(manager2.findStudentById(1));
         assertEquals(7.0, manager2.findStudentById(1).calculateAverage());
+        assertEquals(95.2, manager2.findStudentById(1).getAttendancePercentage());
     }
 
     /**

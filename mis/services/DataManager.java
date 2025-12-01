@@ -89,11 +89,11 @@ public class DataManager
     {
         for(int i = 0 ; i < students.size() ; i++)
         {
-            Student s = students.get(i);
-            if(s.getId() == id)
+            Student student = students.get(i);
+            if(student.getId() == id)
             {
                 // De-enrol from course if assigned
-                Course course = s.getCourse();
+                Course course = student.getCourse();
                 if(course != null)
                 {
                     course.removeStudent(id);
@@ -113,11 +113,11 @@ public class DataManager
      */
     public Student findStudentById(int id)
     {
-        for(Student s : students)
+        for(Student student : students)
         {
-            if(s.getId() == id)
+            if(student.getId() == id)
             {
-                return s;
+                return student;
             }
         }
         return null;
@@ -138,9 +138,9 @@ public class DataManager
         }
         else
         {
-            for(Student s : students)
+            for(Student student : students)
             {
-                System.out.println("\n" + s + "\n");
+                System.out.println("\n" + student + "\n");
             }
         }
     }
@@ -220,11 +220,11 @@ public class DataManager
      */
     public Staff findStaffById(int id)
     {
-        for(Staff s : staffMembers)
+        for(Staff staff : staffMembers)
         {
-            if (s.getId() == id)
+            if (staff.getId() == id)
             {
-                return s;
+                return staff;
             }
         }
         return null;
@@ -245,9 +245,9 @@ public class DataManager
         }
         else
         {
-            for(Staff s : staffMembers)
+            for(Staff staff : staffMembers)
             {
-                System.out.println(s);
+                System.out.println(staff);
             }
         }
     }
@@ -334,11 +334,11 @@ public class DataManager
      */
     public Course findCourseByCode(String code)
     {
-        for (Course c : courses)
+        for (Course course : courses)
         {
-            if (c.getCode().equalsIgnoreCase(code))
+            if (course.getCode().equalsIgnoreCase(code))
             {
-                return c;
+                return course;
             }
         }
         return null;
@@ -365,15 +365,15 @@ public class DataManager
     {
         for(int i = 0 ; i < courses.size() ; i++)
         {
-            Course c = courses.get(i);
-            if(c.getCode().equalsIgnoreCase(code))
+            Course course = courses.get(i);
+            if(course.getCode().equalsIgnoreCase(code))
             {
                 // Nullify course for all students enrolled in this course
-                for(Student s : students)
+                for(Student student : students)
                 {
-                    if(s.getCourse() != null && s.getCourse().getCode().equalsIgnoreCase(code))
+                    if(student.getCourse() != null && student.getCourse().getCode().equalsIgnoreCase(code))
                     {
-                        s.setCourse(null);
+                        student.setCourse(null);
                     }
                 }
                 courses.remove(i);

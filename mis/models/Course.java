@@ -96,10 +96,10 @@ public class Course
         System.out.println("Students enrolled in " + title + ":");
         for(int id : enrolledStudentIds)
         {
-            Student s = manager.findStudentById(id);
-            if(s != null)
+            Student student = manager.findStudentById(id);
+            if(student != null)
             {
-                System.out.println(s);
+                System.out.println(student);
             }
         }
     }
@@ -130,7 +130,7 @@ public class Course
         else
         {
             return enrolledStudentIds.stream()
-                                     .map(String::valueOf)
+                                     .map(x -> String.valueOf(x))
                                      .reduce((a, b) -> a + "," + b)
                                      .orElse("");
         }

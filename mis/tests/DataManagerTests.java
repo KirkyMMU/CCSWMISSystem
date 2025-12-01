@@ -58,9 +58,9 @@ public class DataManagerTests
     @Test
     void testAddStudentSuccessfully()
     {
-        Student s = new Student(1, "Alice", "alice@example.com");
-        assertTrue(manager.addStudent(s));
-        assertEquals(s, manager.findStudentById(1));
+        Student student = new Student(1, "Alice", "alice@example.com");
+        assertTrue(manager.addStudent(student));
+        assertEquals(student, manager.findStudentById(1));
     }
 
     /**
@@ -78,10 +78,10 @@ public class DataManagerTests
     @Test
     void testAddDuplicateStudentIdFails()
     {
-        Student s1 = new Student(1, "Alice", "alice@example.com");
-        Student s2 = new Student(1, "Bob", "bob@example.com");
-        manager.addStudent(s1);
-        assertFalse(manager.addStudent(s2));
+        Student student1 = new Student(1, "Alice", "alice@example.com");
+        Student student2 = new Student(1, "Bob", "bob@example.com");
+        manager.addStudent(student1);
+        assertFalse(manager.addStudent(student2));
     }
 
     /**
@@ -102,13 +102,13 @@ public class DataManagerTests
     @Test
     void testRemoveStudentAlsoDeEnrolsFromCourse()
     {
-        Course c = new Course("CS101", "Computer Science");
-        Student s = new Student(1, "Alice", "alice@example.com", c);
-        manager.addCourse(c);
-        manager.addStudent(s);
+        Course course = new Course("CS101", "Computer Science");
+        Student student = new Student(1, "Alice", "alice@example.com", course);
+        manager.addCourse(course);
+        manager.addStudent(student);
 
         assertTrue(manager.removeStudentById(1));
-        assertFalse(c.getEnrolledIdsCSV().contains("1"));
+        assertFalse(course.getEnrolledIdsCSV().contains("1"));
     }
 
     /**

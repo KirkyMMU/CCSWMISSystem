@@ -63,9 +63,9 @@ public class CourseMenu
     // Lists all courses currently stored in the DataManager
     private void listCourses()
     {
-        for(Course c : manager.getCourses())
+        for(Course course : manager.getCourses())
         {
-            System.out.println("\n" + c);
+            System.out.println("\n" + course);
         }
     }
 
