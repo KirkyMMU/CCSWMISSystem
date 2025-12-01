@@ -152,7 +152,7 @@ public class Inputs
                     System.out.println("Date must be in the future and within 3 months from today.");
                 }
             }
-            catch(DateTimeParseException e)
+            catch(DateTimeParseException error)
             {
                 // If parsing fails, inform the user and retry
                 System.out.println("Invalid format. Please enter the date as DD/MM/YYYY.");

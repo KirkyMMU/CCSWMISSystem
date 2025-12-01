@@ -58,16 +58,16 @@ public class GradesReport implements Reportable
         StringBuilder builder = new StringBuilder("\n--- Grades Report ---\n");
 
         // Iterate through all students in the DataManager
-        for(Student s : manager.getStudents())
+        for(Student student : manager.getStudents())
         {
             // Calculate the student's average grade
-            double avg = s.calculateAverage();
+            double avg = student.calculateAverage();
 
             // Determine course information (code or "No course")
             String courseInfo;
-            if(s.getCourse() != null)
+            if(student.getCourse() != null)
             {
-                courseInfo = s.getCourse().getCode();
+                courseInfo = student.getCourse().getCode();
             }
             else
             {
@@ -75,12 +75,12 @@ public class GradesReport implements Reportable
             }
 
             // Append student details to the report
-            builder.append(s.getName())
-                   .append(" (ID: ").append(s.getId()).append(")")
+            builder.append(student.getName())
+                   .append(" (ID: ").append(student.getId()).append(")")
                    .append(" - Course: ").append(courseInfo)
                    .append(" | Average Grade: ");
             
-            // Habdle case where no grades exist (average = 0)
+            // Handle case where no grades exist (average = 0)
             if(avg == 0)
             {
                 builder.append("N/A");

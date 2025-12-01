@@ -12,6 +12,7 @@ import java.util.ArrayList;
  *   <li>Association with a {@link Course} object (the course the student
  *       is enrolled in).</li>
  *   <li>Storage of GCSE-style grades (integers 1-9).</li>
+ *   <li>A randomly generated attendance percentage.</li>
  *   <li>Methods to enrol/de-enrol from courses, add grades, caluclate
  *       averages and export grades in CSV format.</li>
  * </ul>
@@ -32,6 +33,9 @@ public class Student extends Person
     // The course the student is enrolled in (null if not assigned)
     private Course course;
 
+    // Attendance percentage (0–100), generated when student is created
+    private double attendancePercentage;
+
     // List of grades (1-9) following GCSE standards
     private ArrayList<Integer> grades = new ArrayList<>();
 
@@ -46,6 +50,7 @@ public class Student extends Person
     {
         super(id, name, email); // Calls the constructor of Person
         this.course = null;     // Student may not have a course initially
+        this.attendancePercentage = generateAttendance(); // Generate random attendance for student
     }
 
     /**  
@@ -69,6 +74,7 @@ public class Student extends Person
         {
             course.enrolStudent(id);
         }
+        this.attendancePercentage = generateAttendance(); // Generate random attendance for student
     }
 
     /**
@@ -79,6 +85,16 @@ public class Student extends Person
     public Course getCourse()
     {
         return course;
+    }
+
+    /**
+     * Getter for attendance percentage.
+     * 
+     * @return the randomly generated attendance percentage for the student
+     */
+    public double getAttendancePercentage()
+    {
+        return attendancePercentage;
     }
 
     /**
@@ -103,6 +119,16 @@ public class Student extends Person
         {
             course.enrolStudent(getId());
         }
+    }
+
+    /**
+     * Setter for attendance percentage
+     * 
+     * @param attendancePercentage the attendance percentage as a double
+     */
+    public void setAttendancePercentage(double attendancePercentage)
+    {
+        this.attendancePercentage = attendancePercentage;
     }
 
     /**
@@ -145,12 +171,24 @@ public class Student extends Person
             return 0;
         }
         int total = 0;
-        for(int g : grades)
+        for(int grade : grades)
         {
-            total += g;
+            total += grade;
         }
         return total / (double) grades.size();
     }
+
+    /** Weighted random generator for attendance (bias towards 100%).
+     * 
+     * @return a double representing the attendance percentage for the student
+     */
+    private static double generateAttendance()
+    {
+        double random = Math.random();       // uniform 0–1
+        double biased = 1 - (random * random);    // bias toward 1
+        return 85 + (biased * 15);      // scale to 85–100
+    }
+
 
     /**
      * Returns the student's grades as a comma-separated string.
@@ -168,7 +206,7 @@ public class Student extends Person
         else
         {
             return grades.stream()
-                         .map(String::valueOf)
+                         .map(x -> String.valueOf(x))
                          .reduce((a, b) -> a + "," + b)
                          .orElse("");
         }
@@ -177,8 +215,8 @@ public class Student extends Person
     /**
      * Returns a string representation of the student.
      * 
-     * <p>Includes inherited personal details (Id, name, email) and 
-     * course information (course code or "No course assigned").</p>
+     * <p>Includes inherited personal details (Id, name, email, attendance percentage) 
+     * and course information (course code or "No course assigned").</p>
      * 
      * @return a formatted string summarising the student
      */
@@ -194,6 +232,7 @@ public class Student extends Person
         {
             courseInfo = "No course assigned.";
         }
-        return super.toString() + " | Course: " + courseInfo;
+        // with formatted percentage attendance
+        return super.toString() + " | Course: " + courseInfo + " | Attendance: " + String.format("%.1f%%", getAttendancePercentage());
     }
 }

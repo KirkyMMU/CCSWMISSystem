@@ -41,8 +41,8 @@ public class StudentTests
     @Test
     void testAddValidGrade()
     {
-        Student s = new Student(1, "Alice", "alice@example.com");
-        assertTrue(s.addGrade(7));
+        Student student = new Student(1, "Alice", "alice@example.com");
+        assertTrue(student.addGrade(7));
     }
 
     /**
@@ -59,8 +59,8 @@ public class StudentTests
     @Test
     void testAddInvalidGradeBelowRange()
     {
-        Student s = new Student(1, "Alice", "alice@example.com");
-        assertFalse(s.addGrade(-1));
+        Student student = new Student(1, "Alice", "alice@example.com");
+        assertFalse(student.addGrade(-1));
     }
 
     /**
@@ -77,8 +77,8 @@ public class StudentTests
     @Test
     void testAddInvalidGradeAboveRange()
     {
-        Student s = new Student(1, "Alice", "alice@example.com");
-        assertFalse(s.addGrade(15));
+        Student student = new Student(1, "Alice", "alice@example.com");
+        assertFalse(student.addGrade(15));
     }
 
 
@@ -98,10 +98,10 @@ public class StudentTests
     @Test
     void testCalculateAverageWithGrades()
     {
-        Student s = new Student(1, "Alice", "alice@example.com");
-        s.addGrade(7);
-        s.addGrade(9);
-        assertEquals(8.0, s.calculateAverage());
+        Student student = new Student(1, "Alice", "alice@example.com");
+        student.addGrade(7);
+        student.addGrade(9);
+        assertEquals(8.0, student.calculateAverage());
     }
 
     /**
@@ -119,8 +119,8 @@ public class StudentTests
     @Test
     void testCalculateAverageNoGradesReturnsZero()
     {
-        Student s = new Student(1, "Alice", "alice@example.com");
-        assertEquals(0.0, s.calculateAverage());
+        Student student = new Student(1, "Alice", "alice@example.com");
+        assertEquals(0.0, student.calculateAverage());
     }
 
     /**
@@ -142,13 +142,13 @@ public class StudentTests
     @Test
     void testSetCourseReassignsCorrectly()
     {
-        Course c1 = new Course("CS101", "Computer Science");
-        Course c2 = new Course("BUS123", "Business");
-        Student s = new Student(1, "Alice", "alice@example.com", c1);
+        Course course1 = new Course("CS101", "Computer Science");
+        Course course2 = new Course("BUS123", "Business");
+        Student student = new Student(1, "Alice", "alice@example.com", course1);
 
-        s.setCourse(c2);
-        assertEquals("BUS123", s.getCourse().getCode());
-        assertFalse(c1.getEnrolledIdsCSV().contains("1"));
-        assertTrue(c2.getEnrolledIdsCSV().contains("1"));
+        student.setCourse(course2);
+        assertEquals("BUS123", student.getCourse().getCode());
+        assertFalse(course1.getEnrolledIdsCSV().contains("1"));
+        assertTrue(course2.getEnrolledIdsCSV().contains("1"));
     }
 }

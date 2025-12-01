@@ -33,9 +33,9 @@ package mis.models;
  * List<Reportable> reports = Arrays.asList(attendanceReport, gradesReport);
  * 
  * // Generate all reports without knowing their concrete types
- * for(Reportable r : reports)
+ * for(Reportable report : reports)
  * {
- *    System.out.println(r.generateReport());
+ *    System.out.println(report.generateReport());
  * }
  * }</pre>
  */

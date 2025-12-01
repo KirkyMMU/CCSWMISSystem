@@ -47,13 +47,13 @@ public class DataIO
         try(PrintWriter writer = new PrintWriter(new FileWriter(path)))
         {
             // Save students
-            for(Student s : manager.getStudents())
+            for(Student student : manager.getStudents())
             {
                 // If student has a course, include the code otherwise leave blank
                 String courseCode;
-                if (s.getCourse() != null)
+                if (student.getCourse() != null)
                 {
-                    courseCode = s.getCourse().getCode();
+                    courseCode = student.getCourse().getCode();
                 }
                 else
                 {
@@ -61,30 +61,30 @@ public class DataIO
                 }
 
                 // Grades are stored as a comma-separated string
-                String grades = s.getGradesCSV();
+                String grades = student.getGradesCSV();
 
-                writer.println("STUDENT|" + s.getId() + "|" + s.getName() + "|" + s.getEmail() + "|" + courseCode + "|" + grades);
+                writer.println("STUDENT|" + student.getId() + "|" + student.getName() + "|" + student.getEmail() + "|" + courseCode + "|" + grades + "|" + student.getAttendancePercentage());
             }
 
             // Save staff
-            for(Staff st : manager.getStaffMembers())
+            for(Staff staff : manager.getStaffMembers())
             {
-                writer.println("STAFF|" + st.getId() + "|" + st.getName() + "|" + st.getEmail() + "|" + st.getRole() + "|" + st.getDepartment());
+                writer.println("STAFF|" + staff.getId() + "|" + staff.getName() + "|" + staff.getEmail() + "|" + staff.getRole() + "|" + staff.getDepartment());
             }
 
             // Save courses
-            for(Course c : manager.getCourses())
+            for(Course course : manager.getCourses())
             {
                 // Enrolled student IDs are stored as a comma-separated string
-                String enrolled = c.getEnrolledIdsCSV();
-                writer.println("COURSE|" + c.getCode() + "|" + c.getTitle() + "|" + enrolled);
+                String enrolled = course.getEnrolledIdsCSV();
+                writer.println("COURSE|" + course.getCode() + "|" + course.getTitle() + "|" + enrolled);
             }
 
             System.out.println("\nData saved successfully to " + path + "\n");
         }
-        catch(IOException e)
+        catch(IOException error)
         {
-            System.out.println("Error saving data: " + e.getMessage());
+            System.out.println("Error saving data: " + error.getMessage());
         }
     }
 
@@ -118,8 +118,10 @@ public class DataIO
                         String name = parts[2];
                         String email = parts[3];
                         String courseCode = parts[4];
+                        double attendance = Double.parseDouble(parts[6]);
 
-                        Student s = new Student(id, name, email);
+                        Student student = new Student(id, name, email);
+                        student.setAttendancePercentage(attendance);
 
                         // Link student to existing course if code is provided
                         if(!courseCode.isEmpty())
@@ -127,7 +129,7 @@ public class DataIO
                             Course c = manager.findCourseByCode(courseCode);
                             if (c != null)
                             {
-                                s.setCourse(c);
+                                student.setCourse(c);
                             }
                         }
 
@@ -136,11 +138,11 @@ public class DataIO
                         {
                             for(String g : parts[5].split(","))
                             {
-                                s.addGrade(Integer.parseInt(g));
+                                student.addGrade(Integer.parseInt(g));
                             }
                         }
 
-                        manager.addStudent(s);
+                        manager.addStudent(student);
                     }
                     case "STAFF" ->
                     {
@@ -151,8 +153,8 @@ public class DataIO
                         String role = parts[4];
                         String department = parts[5];
 
-                        Staff st = new Staff(id, name, email, role, department);
-                        manager.addStaff(st);
+                        Staff staff = new Staff(id, name, email, role, department);
+                        manager.addStaff(staff);
                     }
                     case "COURSE" ->
                     {
@@ -160,25 +162,25 @@ public class DataIO
                         String code = parts[1];
                         String title = parts[2];
 
-                        Course c = new Course(code, title);
-                        manager.addCourse(c);
+                        Course course = new Course(code, title);
+                        manager.addCourse(course);
 
                         // Parse enrolled student IDs if present 
                         if(parts.length > 3 && !parts[3].isEmpty())
                         {
                             for(String idStr : parts[3].split(","))
                             {
-                                c.enrolStudent(Integer.parseInt(idStr));
-                            }
-                        }
-                    }
-                }
-            }
+                                course.enrolStudent(Integer.parseInt(idStr));
+                            } // for
+                        } // if
+                    } // case "COURSE"
+                } // switch
+            } // while
             System.out.println("\nData loaded successfully from " + path + "\n");
-        }
-        catch(IOException e)
+        } // try
+        catch(IOException error)
         {
-            System.out.println("Error loading data: " + e.getMessage());
+            System.out.println("Error loading data: " + error.getMessage());
         }
     }
 }

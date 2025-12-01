@@ -35,9 +35,9 @@ public class CourseTests
     @Test
     void testEnrolStudentAddsId()
     {
-        Course c = new Course("CS101", "Computer Science");
-        c.enrolStudent(1);
-        assertTrue(c.getEnrolledIdsCSV().contains("1"));
+        Course course = new Course("CS101", "Computer Science");
+        course.enrolStudent(1);
+        assertTrue(course.getEnrolledIdsCSV().contains("1"));
     }
 
     /**
@@ -55,9 +55,9 @@ public class CourseTests
     @Test
     void testEnrolDuplicateStudentDoesNotAddTwice()
     {
-        Course c = new Course("CS101", "Computer Science");
-        c.enrolStudent(1);
-        c.enrolStudent(1);
-        assertEquals("1", c.getEnrolledIdsCSV()); // only once
+        Course course = new Course("CS101", "Computer Science");
+        course.enrolStudent(1);
+        course.enrolStudent(1);
+        assertEquals("1", course.getEnrolledIdsCSV()); // only once
     }
 }

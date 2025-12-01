@@ -74,7 +74,7 @@ public class StudentMenu
         String email = Inputs.readString("Enter Student Email:");
         boolean assignCourse = Inputs.confirm("\nDo you want to enrol student onto a course now?");
 
-        Student s;
+        Student student;
         if(assignCourse)
         {
             String courseCode = Inputs.readString("Enter Course Code:");
@@ -86,7 +86,7 @@ public class StudentMenu
             if(existingCourse != null)
             {
                 // Re-use existing course, ignore new title
-                s = new Student(id, name, email, existingCourse);
+                student = new Student(id, name, email, existingCourse);
                 System.out.println("\nCourse code already exists. Student enrolled onto existing course: " + existingCourse.getTitle());
             }
             else
@@ -94,15 +94,15 @@ public class StudentMenu
                 // Create new course if not found
                 Course newCourse = new Course(courseCode, courseTitle);
                 manager.addCourse(newCourse);
-                s = new Student(id, name, email, newCourse);
+                student = new Student(id, name, email, newCourse);
                 System.out.println("\nNew course created and student enrolled.\n");
             }
         }
         else
         {
-            s = new Student(id, name, email);
+            student = new Student(id, name, email);
         }
-        boolean added = manager.addStudent(s);
+        boolean added = manager.addStudent(student);
         if(added)
         {
             System.out.println("\nStudent added successfully.\n");
@@ -145,12 +145,12 @@ public class StudentMenu
     private void addGrade()
     {
         int id = Inputs.readInt("Enter Student ID:");
-        Student s = manager.findStudentById(id);
-        if(s != null)
+        Student student = manager.findStudentById(id);
+        if(student != null)
         {
             int grade = Inputs.readInt("Enter grade (1-9):");
 
-            boolean added = s.addGrade(grade);
+            boolean added = student.addGrade(grade);
             if(added)
             {
                 System.out.println("\nGrade added successfully.\n");

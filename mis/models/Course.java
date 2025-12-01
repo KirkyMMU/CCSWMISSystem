@@ -68,6 +68,16 @@ public class Course
     }
 
     /**
+    * Returns the list of enrolled student IDs.
+    *
+    * @return an ArrayList of student IDs enrolled in this course
+    */
+    public ArrayList<Integer> getEnrolledIds()
+    {
+    return enrolledStudentIds;
+    }
+
+    /**
      * Enrols a student by their ID.
      * 
      * <p>If the student is already enrolled, this method does nothing.
@@ -96,10 +106,10 @@ public class Course
         System.out.println("Students enrolled in " + title + ":");
         for(int id : enrolledStudentIds)
         {
-            Student s = manager.findStudentById(id);
-            if(s != null)
+            Student student = manager.findStudentById(id);
+            if(student != null)
             {
-                System.out.println(s);
+                System.out.println(student);
             }
         }
     }
@@ -130,7 +140,7 @@ public class Course
         else
         {
             return enrolledStudentIds.stream()
-                                     .map(String::valueOf)
+                                     .map(x -> String.valueOf(x))
                                      .reduce((a, b) -> a + "," + b)
                                      .orElse("");
         }

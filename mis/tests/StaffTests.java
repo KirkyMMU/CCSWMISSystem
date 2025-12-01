@@ -37,12 +37,12 @@ public class StaffTests
     @Test
     void testAssignValidTask()
     {
-        Staff st = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+        Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
         LocalDate deadline = LocalDate.now().plusDays(7);
-        st.assignTask("Prepare lesson plan", deadline);
+        staff.assignTask("Prepare lesson plan", deadline);
 
         // Verify that the task appears in the staff member's details
-        assertTrue(st.toString().contains("Prepare lesson plan"));
+        assertTrue(staff.toString().contains("Prepare lesson plan"));
     }
 
     /**
@@ -60,11 +60,11 @@ public class StaffTests
     @Test
     void testAssignTaskPastDeadlineFails()
     {
-        Staff st = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+        Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
         LocalDate pastDate = LocalDate.now().minusDays(1);
-        st.assignTask("Review syllabus", pastDate);
+        staff.assignTask("Review syllabus", pastDate);
 
         // Verify that no task was assigned
-        assertTrue(st.toString().contains("None"));
+        assertTrue(staff.toString().contains("None"));
     }
 }
