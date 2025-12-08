@@ -15,7 +15,7 @@ import mis.services.DataManager;
  *   <li>The student's average grade (or "N/A" if no grades recorded).</li>
  * </ul>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Relies on {@code DataManager.getStudents()} to access the list of
  *       students.</li>

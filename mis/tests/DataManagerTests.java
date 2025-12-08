@@ -16,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * </ul>
  * </p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
- *   <li>Uses JUnit 5 annotations (@Test, @BeforeEach).</li>
+ *   <li>Uses JUnit 5 annotations (Test and BeforeEach)</li>
  *   <li>Each test is independent and uses a fresh {@link DataManager}
  *       instance.</li>
  *   <li>Assertions validate both direct outcomes (return values) and side

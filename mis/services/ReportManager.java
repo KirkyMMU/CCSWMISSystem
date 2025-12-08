@@ -11,7 +11,7 @@ import mis.models.*;
  * without requiring client code to directly instantiate or manage
  * individual report classes.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Encapsulates the creation of {@link Reportable} implementations
  *       such as {@link GradesReport} and {@link AttendanceReport}.</li>

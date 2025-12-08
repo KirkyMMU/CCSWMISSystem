@@ -3,6 +3,7 @@ package mis.ui;
 import mis.models.*;
 import mis.services.DataManager;
 import mis.util.Inputs;
+import mis.util.MenuEscapeException;
 
 /**
  * Handles course-related operations via a console sub-menu.
@@ -10,7 +11,7 @@ import mis.util.Inputs;
  * <p>Provides options to list, add, enrol students, search and remove courses.
  * Encapsulates input handling and delegates persistence to {@link DataManager}.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Uses {@link Inputs} for validated user input.</li>
  *   <li>Delegates storage and retrieval to {@link DataManager}.</li>
@@ -36,8 +37,8 @@ public class CourseMenu
     // Displays the course menu and routes user choices to appropriate actions.
     public void show()
     {
-        int choice;
-        do{
+        while(true)
+        {
             System.out.println("\n ----- Course Menu -----\n");
             System.out.println("1. List Courses");
             System.out.println("2. Add New Course");
@@ -45,23 +46,28 @@ public class CourseMenu
             System.out.println("4. List Students In A Course");
             System.out.println("5. Search Course By Code");
             System.out.println("6. Remove Course");
-            System.out.println("7. Back");
 
-            choice = Inputs.readInt("\nChoose an option (1-7):");
-
-            switch(choice)
+            try
             {
-                case 1 -> { listCourses(); return; }
-                case 2 -> { addCourse(); return; }
-                case 3 -> { enrolStudent(); return; }
-                case 4 -> { listStudentsInCourse(); return; }
-                case 5 -> { searchCourse(); return; }
-                case 6 -> { removeCourse(); return; }
-                case 7 -> { System.out.println("\nReturning to Main Menu..."); return; }
-                default -> System.out.println("\nInvalid option.");
+                int choice = Inputs.readInt("\nChoose an option (1-6):");
+
+                switch(choice)
+                {
+                    case 1 -> { listCourses(); return; }
+                    case 2 -> { addCourse(); return; }
+                    case 3 -> { enrolStudent(); return; }
+                    case 4 -> { listStudentsInCourse(); return; }
+                    case 5 -> { searchCourse(); return; }
+                    case 6 -> { removeCourse(); return; }
+                    default -> System.out.println("\nInvalid option.");
+                }
+            }
+            catch(MenuEscapeException exception)
+            {
+                System.out.println("\nReturning to Main Menu...");
+                return;
             }
         }
-        while(choice != 7);
     }
 
     // Lists all courses currently stored in the DataManager
@@ -82,19 +88,26 @@ public class CourseMenu
      */
     private void addCourse()
     {
-        String code = Inputs.readString("\nEnter the new Course Code:");
-        String title = Inputs.readString("Enter the new Course Title:");
-
-        Course course = new Course(code, title);
-        boolean added = manager.addCourse(course);
-
-        if(added)
+        try
         {
-            System.out.println("\nCourse added successfully.");
+            String code = Inputs.readString("\nEnter the new Course Code:");
+            String title = Inputs.readString("Enter the new Course Title:");
+
+            Course course = new Course(code, title);
+            boolean added = manager.addCourse(course);
+
+            if(added)
+            {
+                System.out.println("\nCourse added successfully.");
+            }
+            else
+            {
+                System.out.println("\nCourse Code already exists. Course not added.");
+            }
         }
-        else
+        catch(MenuEscapeException exception)
         {
-            System.out.println("\nCourse Code already exists. Course not added.");
+            throw exception;
         }
     }
 
@@ -107,27 +120,34 @@ public class CourseMenu
      */
     private void enrolStudent()
     {
-        String code = Inputs.readString("\nEnter the Course Code:");
-        Course course = manager.findCourseByCode(code);
-
-        if(course != null)
+        try
         {
-            int studentID = Inputs.readInt("Enter Student ID to enrol:");
-            Student student = manager.findStudentById(studentID);
+            String code = Inputs.readString("\nEnter the Course Code:");
+            Course course = manager.findCourseByCode(code);
 
-            if(student != null)
+            if(course != null)
             {
-                student.setCourse(course);
-                System.out.println("\nStudent enrolled successfully.");
+                int studentID = Inputs.readInt("Enter Student ID to enrol:");
+                Student student = manager.findStudentById(studentID);
+
+                if(student != null)
+                {
+                    student.setCourse(course);
+                    System.out.println("\nStudent enrolled successfully.");
+                }
+                else
+                {
+                    System.out.println("\nStudent ID not found.");
+                }
             }
             else
             {
-                System.out.println("\nStudent ID not found.");
+                System.out.println("\nCourse Code not found.");
             }
         }
-        else
+        catch(MenuEscapeException exception)
         {
-            System.out.println("\nCourse Code not found.");
+            throw exception;
         }
     }
 
@@ -139,16 +159,23 @@ public class CourseMenu
      */
     private void listStudentsInCourse()
     {
-        String code = Inputs.readString("\nEnter the Course Code:");
-        Course course = manager.findCourseByCode(code);
+        try
+        {
+            String code = Inputs.readString("\nEnter the Course Code:");
+            Course course = manager.findCourseByCode(code);
 
-        if(course != null)
-        {
-            course.listEnrolled(manager);
+            if(course != null)
+            {
+                course.listEnrolled(manager);
+            }
+            else
+            {
+                System.out.println("\nCourse not found.");
+            }
         }
-        else
+        catch(MenuEscapeException exception)
         {
-            System.out.println("\nCourse not found.");
+            throw exception;
         }
     }
 
@@ -160,16 +187,23 @@ public class CourseMenu
      */
     private void searchCourse()
     {
-        String code = Inputs.readString("\nEnter the Course Code:");
-        Course course = manager.findCourseByCode(code);
+        try
+        {
+            String code = Inputs.readString("\nEnter the Course Code:");
+            Course course = manager.findCourseByCode(code);
 
-        if(course != null)
-        {
-            System.out.println(course);
+            if(course != null)
+            {
+                System.out.println(course);
+            }
+            else
+            {
+                System.out.println("\nCourse not found.");
+            }
         }
-        else
+        catch(MenuEscapeException exception)
         {
-            System.out.println("\nCourse not found.");
+            throw exception;
         }
     }
 
@@ -182,16 +216,23 @@ public class CourseMenu
      */
     private void removeCourse()
     {
-        String code = Inputs.readString("\nEnter Course Code to remove:");
-        boolean removed = manager.removeCourseByCode(code);
+        try
+        {
+            String code = Inputs.readString("\nEnter Course Code to remove:");
+            boolean removed = manager.removeCourseByCode(code);
 
-        if(removed)
-        {
-            System.out.println("\nCourse removed successfully.");
+            if(removed)
+            {
+                System.out.println("\nCourse removed successfully.");
+            }
+            else
+            {
+                System.out.println("\nCourse not found.");
+            }
         }
-        else
+        catch(MenuEscapeException exception)
         {
-            System.out.println("\nCourse not found.");
+            throw exception;
         }
     }
 }

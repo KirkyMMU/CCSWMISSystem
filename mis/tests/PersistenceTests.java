@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * saved to a file and subsequently reloaded correctly, ensuring that
  * student information and student data are both preserved across sessions.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Uses a temporary test file ("test_data.txt") for persistence checks.</li>
  *   <li>Validates both structural persistence (student exists after reload) and

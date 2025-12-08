@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * </ul>
  * </p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Uses JUnit 5 annotations (@Test) and assertions from 
  *       {@link org.junit.jupiter.api.Assertions}.</li>

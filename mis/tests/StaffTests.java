@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * members, ensuring that deadlines are validated correctly and tasks
  * are refelcted in the staff member's string representation.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Uses JUnit 5 annotations (@Test) and assertions from
  *       {@link org.junit.jupiter.api.Assertions}.</li>

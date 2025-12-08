@@ -17,7 +17,7 @@ import java.util.ArrayList;
  *       averages and export grades in CSV format.</li>
  * </ul>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Grades are stored as integers to reflect GCSE standards (1-9).</li>
  *   <li>Course enrolment is managed bidirectionally; setting a course also

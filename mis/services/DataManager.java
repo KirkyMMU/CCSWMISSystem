@@ -10,13 +10,13 @@ import java.util.ArrayList;
  * add, remove, list and search for entities. It ensures consistency across relationships
  * (e.g. students enrolled in courses) and enforces uniqueness of IDs.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Maintains in-memory collections of {@link Student}, {@link Staff} and
  *       {@link Course} objects.</li>
  *   <li>Provides utility methods for CRUD operations (create, read, update, delete).</li>
  *   <li>Ensures referential integrity; when students are added/removed, their course
- *       enrolements are updated accordingly.</li>
+ *       enrolments are updated accordingly.</li>
  *   <li>Intended as a lightweight service layer without persistent storage.</li>
  * </ul>
  * </p>

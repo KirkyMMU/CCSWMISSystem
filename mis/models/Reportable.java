@@ -8,7 +8,7 @@ package mis.models;
  * implementation of the {@link #generateReport()} method which returns
  * a string representation of the report.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Encourages consistency across different types of reports (e.g.
  *       attendance or grades).</li>

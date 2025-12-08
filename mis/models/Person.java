@@ -8,7 +8,7 @@ package mis.models;
  * shared attributes (ID, name, email) and provides basic accessor and 
  * mutator methods.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Marked as {@code abstract} to prevent direct instantiation - only
  *       subclasses should represent concrete people.</li>

@@ -1,5 +1,6 @@
 package mis.models;
 
+import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
@@ -12,7 +13,7 @@ import java.time.format.DateTimeFormatter;
  * attributes like role and department and provides functionality for
  * assigning tasks with deadlines.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Encapsulates staff metadata (role, department) to distinguish staff
  *       from students.</li>
@@ -88,11 +89,11 @@ public class Staff extends Person
         this.department = department;
     }
 
-    // The current task assigned to the staff member, including deadline information.
-    private String currentTask;
+    // List of tasks assigned to the staff member.
+    private ArrayList<String> tasks = new ArrayList<>();
 
     /**
-     * Assigns a task to the staff member with a deadline.
+     * Assigns a task with a deadline to a staff member.
      * 
      * <p>This method validates the deadline to ensure it is:
      * <ul>
@@ -132,9 +133,58 @@ public class Staff extends Person
         }
 
         // Assign task with formatted deadline
-        currentTask = task + " (Deadline: " + formattedDate + ")";
-        System.out.println(getName() + " assigned to: " + currentTask);
+        String taskEntry = task + " (Deadline: " + formattedDate + ")";
+        tasks.add(taskEntry);
     }
+
+    /**
+     * Returns all tasks assigned to this staff member.
+     * 
+     * @return list of task strings
+     */
+    public ArrayList<String> getTasks()
+    {
+        return tasks;
+    }
+
+    /**
+     * Returns a comma-separated string of tasks for persistence.
+     * 
+     * @return CSV string of tasks or empty string if none exist
+     */
+    public String getTasksCSV()
+    {
+        if(tasks.isEmpty())
+        {
+            return "";
+        }
+        return String.join(",", tasks);
+    }
+
+    /**
+     * Removes a task from this staff member's task list.
+     *
+     * <p>This method searches the internal {@code tasks} list for the given
+     * task description and removes it if found. If the task does not exist,
+     * no changes are made.</p>
+     *
+     * <p>Steps:
+     * <ol>
+     *   <li>Receive the task description to remove.</li>
+     *   <li>Check if the {@code tasks} list contains the task.</li>
+     *   <li>If present, remove the task and return {@code true}.</li>
+     *   <li>If not present, return {@code false} to indicate no removal occurred.</li>
+     * </ol>
+     * </p>
+     *
+     * @param task the description of the task to remove
+     * @return {@code true} if the task was removed, {@code false} otherwise
+     */
+    public boolean removeTask(String task)
+    {
+        return tasks.remove(task);
+    }
+
 
     /**
      * Returns a string representation of the staff member.
@@ -153,14 +203,14 @@ public class Staff extends Person
     public String toString()
     {
         String taskDisplay;
-        if(currentTask == null || currentTask.isEmpty())
+        if(tasks.isEmpty())
         {
             taskDisplay = "None";
         }
         else
         {
-            taskDisplay = currentTask;
+            taskDisplay = String.join("; ", tasks);
         }
-        return super.toString() + " - " + role + " in " + department + ", Current task: " + taskDisplay;
+        return super.toString() + " - " + role + " in " + department + ", Current task(s): " + taskDisplay;
     }
 }

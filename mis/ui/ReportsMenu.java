@@ -2,6 +2,7 @@ package mis.ui;
 
 import mis.services.*;
 import mis.util.Inputs;
+import mis.util.MenuEscapeException;
 
 /**
  * Handles report-related operations via a console sub-menu.
@@ -9,7 +10,7 @@ import mis.util.Inputs;
  * <p>Provides options to generate and display reports such as grades and attendance.
  * Encapsulates input handling and delegates report generation to {@link ReportManager}.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Uses {@link Inputs} for validated user input.</li>
  *   <li>Delegates report generation to {@link ReportManager}.</li>
@@ -35,27 +36,31 @@ public class ReportsMenu
     // Displays the reports menu and routes user choices to appropriate actions
     public void show()
     {
-        int choice;
-        do
+        while(true)
         {
             System.out.println("\n ----- Reports Menu -----\n");
             System.out.println("1. Grades Report");
             System.out.println("2. Attendance Report");
-            System.out.println("3. Back");
 
-            choice = Inputs.readInt("\nChoose an option (1-3):");
-
-            // Create a ReportManager for generating reports
-            ReportManager reportManager = new ReportManager(manager);
-
-            switch(choice)
+            try
             {
-                case 1 -> { System.out.println(reportManager.buildGradesReport()); return; }
-                case 2 -> { System.out.println(reportManager.buildAttendanceReport()); return; }
-                case 3 -> { System.out.println("\nReturning to Main Menu..."); return; }
-                default -> System.out.println("\nInvalid option.");
+                int choice = Inputs.readInt("\nChoose an option (1-2):");
+
+                // Create a ReportManager for generating reports
+                ReportManager reportManager = new ReportManager(manager);
+
+                switch(choice)
+                {
+                    case 1 -> { System.out.println(reportManager.buildGradesReport()); return; }
+                    case 2 -> { System.out.println(reportManager.buildAttendanceReport()); return; }
+                    default -> System.out.println("\nInvalid option.");
+                }
             }
-        }
-        while(choice != 3);
-    }
-}
+            catch(MenuEscapeException exception)
+            {
+                System.out.println("\nReturning to Main Menu...");
+                return;
+            } // catch
+        } // while
+    } // void
+} // class

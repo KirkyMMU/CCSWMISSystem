@@ -10,7 +10,7 @@ import mis.util.Inputs;
  * reports and save/load operations. Encapsulates input handling and delegates
  * detailed operations to the respective menu classes.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Uses {@link Inputs} for validated user input.</li>
  *   <li>Delegates persistence and business logic to {@link DataManager} and sub-menus.</li>

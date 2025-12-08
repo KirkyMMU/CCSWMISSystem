@@ -18,7 +18,7 @@ import java.time.format.DateTimeParseException;
  * </ul>
  * </p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Uses a single shared {@link Scanner} instance bound to {@code System.in}.</li>
  *   <li>All methods loop until valid input is provided.</li>
@@ -46,6 +46,12 @@ public class Inputs
             {
                 System.out.print(prompt + " ");
                 String input = scanner.nextLine().trim();
+
+                // Escape command
+                if(input.equalsIgnoreCase("menu"))
+                {
+                    throw new MenuEscapeException();
+                }
 
                 try
                 {
@@ -82,6 +88,12 @@ public class Inputs
         {
             System.out.print(prompt + " ");
             String input = scanner.nextLine().trim();
+
+            // Escape command
+            if(input.equalsIgnoreCase("menu"))
+            {
+                throw new MenuEscapeException();
+            }
 
             try
             {
@@ -172,6 +184,12 @@ public class Inputs
             System.out.print(prompt + " (DD/MM/YYYY): ");
             String input = scanner.nextLine().trim();
         
+            // Escape command
+            if(input.equalsIgnoreCase("menu"))
+            {
+                throw new MenuEscapeException();
+            }
+
             try
             {
                 // Attempt to parse the input using the formatter
@@ -188,14 +206,14 @@ public class Inputs
                 }
                 else
                 {
-                    System.out.println("\nDate must be in the future and within 3 months from today.");
+                    System.out.println("\nDate must be in the future and within 3 months from today.\n");
                 }
             }
             catch(DateTimeParseException exception)
             {
                 // If parsing fails, inform the user and retry
-                System.out.println("\nInvalid format. Please enter the date as DD/MM/YYYY.");
-            }
-        }
-    }
-}
+                System.out.println("\nInvalid format. Please enter the date as DD/MM/YYYY.\n");
+            } // catch
+        } // while
+    } // static
+} // class

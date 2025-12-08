@@ -10,7 +10,7 @@ import mis.services.DataManager;
  * displays their attendance percentages. Attendance values are stored
  * per student and persisted via {@link mis.util.DataIO}.</p>
  *
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Attendance values are generated when students are created and
  *       typically fall between 85–100%, with 100% being common.</li>

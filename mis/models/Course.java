@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * methods to enrol and remove students, list enrolled students and generate
  * a summary string representation.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Students are tracked by their unique IDs rather than direct references,
  *       which simplifies persistence and avoids circular dependencies.</li>

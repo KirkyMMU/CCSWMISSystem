@@ -3,6 +3,7 @@ package mis.ui;
 import mis.models.*;
 import mis.services.*;
 import mis.util.Inputs;
+import mis.util.MenuEscapeException;
 
 /**
  * Handles student-related operations via a console sub-menu.
@@ -10,7 +11,7 @@ import mis.util.Inputs;
  * <p>Provides options to add, list, remove and update student records.
  * Encapsulates input handling and delegates persistence to {@link DataManager}.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Uses {@link Inputs} for validated user input.</li>
  *   <li>Delegates storage and retrieval to {@link DataManager}.</li>
@@ -36,29 +37,33 @@ public class StudentMenu
     // Displays the student menu and routes user choices to appropriate actions
     public void show()
     {
-        int choice;
-        do
+        while(true)
         {
             System.out.println("\n ----- Student Menu -----\n");
             System.out.println("1. Add Student");
             System.out.println("2. List Students");
             System.out.println("3. Remove Student");
             System.out.println("4. Add Grade to Student");
-            System.out.println("5. Back");
 
-            choice = Inputs.readInt("\nChoose an option (1-5):");
-
-            switch(choice)
+            try
             {
-                case 1 -> { addStudent(); return; }
-                case 2 -> { manager.listStudents(); return; }
-                case 3 -> { removeStudent(); return; }
-                case 4 -> { addGrade(); return; }
-                case 5 -> { System.out.println("\nReturning to Main Menu..."); return; }
-                default -> System.out.println("\nInvalid option.");
+                int choice = Inputs.readInt("\nChoose an option (1-4):");
+
+                switch(choice)
+                {
+                    case 1 -> { addStudent(); return; }
+                    case 2 -> { manager.listStudents(); return; }
+                    case 3 -> { removeStudent(); return; }
+                    case 4 -> { addGrade(); return; }
+                    default -> System.out.println("\nInvalid option.");
+                }
+            }
+            catch(MenuEscapeException exception)
+            {
+                System.out.println("\nReturning to Main Menu...");
+                return;
             }
         }
-        while(choice != 5);
     }
 
     /**
@@ -74,47 +79,54 @@ public class StudentMenu
      */
     private void addStudent()
     {
-        int id = Inputs.readInt("\nEnter Student ID:");
-        String name = Inputs.readString("Enter Student Name:");
-        String email = Inputs.readString("Enter Student Email:");
-        boolean assignCourse = Inputs.confirm("\nDo you want to enrol student onto a course now?");
-
-        Student student;
-        if(assignCourse)
+        try
         {
-            String courseCode = Inputs.readString("Enter Course Code:");
-            String courseTitle = Inputs.readString("Enter Course Title:");
+            int id = Inputs.readInt("\nEnter Student ID:");
+            String name = Inputs.readString("Enter Student Name:");
+            String email = Inputs.readString("Enter Student Email:");
+            boolean assignCourse = Inputs.confirm("\nDo you want to enrol student onto a course now?");
 
-            // Check if course code already exists in DataManager
-            Course existingCourse = manager.findCourseByCode(courseCode);
-
-            if(existingCourse != null)
+            Student student;
+            if(assignCourse)
             {
-                // Re-use existing course, ignore new title
-                student = new Student(id, name, email, existingCourse);
-                System.out.println("\nCourse code already exists. If student is added,\nstudent will be enrolled onto existing course: " + existingCourse.getTitle());
+                String courseCode = Inputs.readString("Enter Course Code:");
+                String courseTitle = Inputs.readString("Enter Course Title:");
+
+                // Check if course code already exists in DataManager
+                Course existingCourse = manager.findCourseByCode(courseCode);
+
+                if(existingCourse != null)
+                {
+                    // Re-use existing course, ignore new title
+                    student = new Student(id, name, email, existingCourse);
+                    System.out.println("\nCourse code already exists. If student is added,\nstudent will be enrolled onto existing course: " + existingCourse.getTitle());
+                }
+                else
+                {
+                    // Create new course if not found
+                    Course newCourse = new Course(courseCode, courseTitle);
+                    manager.addCourse(newCourse);
+                    student = new Student(id, name, email, newCourse);
+                    System.out.println("\nNew course created and student enrolled.");
+                }
             }
             else
             {
-                // Create new course if not found
-                Course newCourse = new Course(courseCode, courseTitle);
-                manager.addCourse(newCourse);
-                student = new Student(id, name, email, newCourse);
-                System.out.println("\nNew course created and student enrolled.");
+                student = new Student(id, name, email);
+            }
+            boolean added = manager.addStudent(student);
+            if(added)
+            {
+                System.out.println("\nStudent added successfully.");
+            }
+            else
+            {
+                System.out.println("\nStudent ID already exists. Student not added.");
             }
         }
-        else
+        catch(MenuEscapeException exception)
         {
-            student = new Student(id, name, email);
-        }
-        boolean added = manager.addStudent(student);
-        if(added)
-        {
-            System.out.println("\nStudent added successfully.");
-        }
-        else
-        {
-            System.out.println("\nStudent ID already exists. Student not added.");
+            throw exception;
         }
     }
 
@@ -127,16 +139,23 @@ public class StudentMenu
      */
     private void removeStudent()
     {
-        int id = Inputs.readInt("\nEnter Student ID to remove:");
+        try
+        {
+            int id = Inputs.readInt("\nEnter Student ID to remove:");
 
-        boolean removed = manager.removeStudentById(id);
-        if(removed)
-        {
-            System.out.println("\nStudent removed successfully.");
+            boolean removed = manager.removeStudentById(id);
+            if(removed)
+            {
+                System.out.println("\nStudent removed successfully.");
+            }
+            else
+            {
+                System.out.println("\nStudent not found.");
+            }
         }
-        else
+        catch(MenuEscapeException exception)
         {
-            System.out.println("\nStudent not found.");
+            throw exception;
         }
     }
 
@@ -149,21 +168,28 @@ public class StudentMenu
      */
     private void addGrade()
     {
-        int id = Inputs.readInt("\nEnter Student ID:");
-        Student student = manager.findStudentById(id);
-        if(student != null)
+        try
         {
-            int grade = Inputs.readInt("Enter grade (1-9):");
-
-            boolean added = student.addGrade(grade);
-            if(added)
+            int id = Inputs.readInt("\nEnter Student ID:");
+            Student student = manager.findStudentById(id);
+            if(student != null)
             {
-                System.out.println("\nGrade added successfully.");
+                int grade = Inputs.readInt("Enter grade (1-9):");
+
+                boolean added = student.addGrade(grade);
+                if(added)
+                {
+                    System.out.println("\nGrade added successfully.");
+                }
+            }
+            else
+            {
+                System.out.println("\nStudent not found.");
             }
         }
-        else
+        catch(MenuEscapeException exception)
         {
-            System.out.println("\nStudent not found.");
+            throw exception;
         }
     }
 }

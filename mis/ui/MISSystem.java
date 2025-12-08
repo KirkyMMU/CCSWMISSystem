@@ -24,23 +24,29 @@ public class MISSystem
      */
     public static void main(String[] args)
     {
-        // Create the central data manager to store students, staff and courses.
-        // This instance is shared across all menus to ensure consistent state.
+        /*
+        Create the central data manager to store students, staff and courses.
+        This instance is shared across all menus to ensure consistent state. 
+        */
         DataManager manager = new DataManager();
 
-        // Flag to control the Main Menu loop.
-        // 'true' means the system is running, 'false' ends the programme.
+        /*
+        Flag to control the Main Menu loop.
+        'true' means the system is running, 'false' ends the programme.
+        */
         boolean running = true;
 
         // Display a welcome message at startup.
-        System.out.println("\nWelcome to the MIS System.");
+        System.out.println("\nWelcome to the MIS System.\n\n*Important Note*: At any point during this programme,\nyou can type \"menu\" to return to the Main Menu.");
 
         // Create the Main Menu, passing in the shared DataManager.
         MainMenu menu = new MainMenu(manager);
 
-        // Main Menu loop:
-        // Continues showing the menu until 'menu.show()' returns false
-        // which happens when the user confirms exit.
+        /*
+        Main Menu loop:
+        Continues showing the menu until 'menu.show()' returns false
+        which happens when the user confirms exit.
+        */
         while(running)
         {
             running = menu.show();

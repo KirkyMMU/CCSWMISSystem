@@ -12,7 +12,7 @@ import java.io.*;
  * each line begins with a record type identifier ("STUDENT", "STAFF", "COURSE")
  * followed by pipe-delimited fields.</p>
  * 
- * <p>Design notes:
+ * <p><b>Design notes:</b>
  * <ul>
  *   <li>Uses {@link PrintWriter} and {@link FileWriter} for saving data.</li>
  *   <li>Uses {@link BufferedReader} and {@link FileReader} for loading data.</li>
@@ -69,7 +69,7 @@ public class DataIO
             // Save staff
             for(Staff staff : manager.getStaffMembers())
             {
-                writer.println("STAFF|" + staff.getId() + "|" + staff.getName() + "|" + staff.getEmail() + "|" + staff.getRole() + "|" + staff.getDepartment());
+                writer.println("STAFF|" + staff.getId() + "|" + staff.getName() + "|" + staff.getEmail() + "|" + staff.getRole() + "|" + staff.getDepartment() + "|" + staff.getTasksCSV());
             }
 
             // Save courses
@@ -154,6 +154,15 @@ public class DataIO
                         String department = parts[5];
 
                         Staff staff = new Staff(id, name, email, role, department);
+                        
+                        if(parts.length > 6 && !parts[6].isEmpty())
+                        {
+                            String[] tasks = parts[6].split(",");
+                            for(String task : tasks)
+                            {
+                                staff.getTasks().add(task);
+                            }
+                        }
                         manager.addStaff(staff);
                     }
                     case "COURSE" ->
