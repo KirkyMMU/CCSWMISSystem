@@ -36,24 +36,29 @@ public class StudentMenu
     // Displays the student menu and routes user choices to appropriate actions
     public void show()
     {
-        System.out.println("\n ----- Student Menu -----\n");
-        System.out.println("1. Add Student");
-        System.out.println("2. List Students");
-        System.out.println("3. Remove Student");
-        System.out.println("4. Add Grade to Student");
-        System.out.println("5. Back");
-
-        int choice = Inputs.readInt("\nChoose an option (1-5):");
-
-        switch(choice)
+        int choice;
+        do
         {
-            case 1 -> addStudent();
-            case 2 -> manager.listStudents();
-            case 3 -> removeStudent();
-            case 4 -> addGrade();
-            case 5 -> System.out.println("\nReturning to Main Menu...");
-            default -> System.out.println("\nInvalid option.");
+            System.out.println("\n ----- Student Menu -----\n");
+            System.out.println("1. Add Student");
+            System.out.println("2. List Students");
+            System.out.println("3. Remove Student");
+            System.out.println("4. Add Grade to Student");
+            System.out.println("5. Back");
+
+            choice = Inputs.readInt("\nChoose an option (1-5):");
+
+            switch(choice)
+            {
+                case 1 -> { addStudent(); return; }
+                case 2 -> { manager.listStudents(); return; }
+                case 3 -> { removeStudent(); return; }
+                case 4 -> { addGrade(); return; }
+                case 5 -> { System.out.println("\nReturning to Main Menu..."); return; }
+                default -> System.out.println("\nInvalid option.");
+            }
         }
+        while(choice != 5);
     }
 
     /**
@@ -105,11 +110,11 @@ public class StudentMenu
         boolean added = manager.addStudent(student);
         if(added)
         {
-            System.out.println("\nStudent added successfully.\n");
+            System.out.println("\nStudent added successfully.");
         }
         else
         {
-            System.out.println("\nStudent ID already exists. Student not added.\n");
+            System.out.println("\nStudent ID already exists. Student not added.");
         }
     }
 

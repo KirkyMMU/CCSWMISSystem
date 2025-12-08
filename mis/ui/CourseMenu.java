@@ -36,28 +36,32 @@ public class CourseMenu
     // Displays the course menu and routes user choices to appropriate actions.
     public void show()
     {
-        System.out.println("\n ----- Course Menu -----\n");
-        System.out.println("1. List Courses");
-        System.out.println("2. Add New Course");
-        System.out.println("3. Enrol Student Onto Course");
-        System.out.println("4. List Students In A Course");
-        System.out.println("5. Search Course By Code");
-        System.out.println("6. Remove Course");
-        System.out.println("7. Back");
+        int choice;
+        do{
+            System.out.println("\n ----- Course Menu -----\n");
+            System.out.println("1. List Courses");
+            System.out.println("2. Add New Course");
+            System.out.println("3. Enrol Student Onto Course");
+            System.out.println("4. List Students In A Course");
+            System.out.println("5. Search Course By Code");
+            System.out.println("6. Remove Course");
+            System.out.println("7. Back");
 
-        int choice = Inputs.readInt("\nChoose an option (1-7):");
+            choice = Inputs.readInt("\nChoose an option (1-7):");
 
-        switch(choice)
-        {
-            case 1 -> listCourses();
-            case 2 -> addCourse();
-            case 3 -> enrolStudent();
-            case 4 -> listStudentsInCourse();
-            case 5 -> searchCourse();
-            case 6 -> removeCourse();
-            case 7 -> System.out.println("\nReturning to Main Menu...");
-            default -> System.out.println("\nInvalid option.");
+            switch(choice)
+            {
+                case 1 -> { listCourses(); return; }
+                case 2 -> { addCourse(); return; }
+                case 3 -> { enrolStudent(); return; }
+                case 4 -> { listStudentsInCourse(); return; }
+                case 5 -> { searchCourse(); return; }
+                case 6 -> { removeCourse(); return; }
+                case 7 -> { System.out.println("\nReturning to Main Menu..."); return; }
+                default -> System.out.println("\nInvalid option.");
+            }
         }
+        while(choice != 7);
     }
 
     // Lists all courses currently stored in the DataManager

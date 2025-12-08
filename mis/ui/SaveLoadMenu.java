@@ -36,19 +36,24 @@ public class SaveLoadMenu
     // Displays the save/load menu and routes user choices to appropriate actions
     public void show()
     {
-        System.out.println("\n ----- Save/Load Menu -----\n");
-        System.out.println("1. Save Data");
-        System.out.println("2. Load Data");
-        System.out.println("3. Back");
-
-        int choice = Inputs.readInt("\nChoose an option (1-3):");
-
-        switch(choice)
+        int choice;
+        do
         {
-            case 1 -> DataIO.saveToFile(manager, "mis_data.txt");
-            case 2 -> DataIO.loadFromFile(manager, "mis_data.txt");
-            case 3 -> System.out.println("\nReturning to Main Menu...");
-            default -> System.out.println("\nInvalid option.");
+            System.out.println("\n ----- Save/Load Menu -----\n");
+            System.out.println("1. Save Data");
+            System.out.println("2. Load Data");
+            System.out.println("3. Back");
+
+            choice = Inputs.readInt("\nChoose an option (1-3):");
+
+            switch(choice)
+            {
+                case 1 -> { DataIO.saveToFile(manager, "mis_data.txt"); return; }
+                case 2 -> { DataIO.loadFromFile(manager, "mis_data.txt"); return; }
+                case 3 -> { System.out.println("\nReturning to Main Menu..."); return; }
+                default -> System.out.println("\nInvalid option.");
+            }
         }
+        while(choice != 3);
     }
 }

@@ -1,5 +1,6 @@
 package mis.util;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -41,17 +42,30 @@ public class Inputs
          */
         public static int readInt(String prompt)
         {
-            System.out.print(prompt + " ");
-            while(!scanner.hasNextInt())
+            while(true)
             {
-                System.out.println("Invalid number. Please enter a whole number.");
-                scanner.next(); // discard invalid input
                 System.out.print(prompt + " ");
+                String input = scanner.nextLine().trim();
+
+                try
+                {
+                    // Attempt to parse the input
+                    return Integer.parseInt(input);
+                }
+                catch(NumberFormatException exception)
+                {
+                    System.out.println("\nInvalid number format. Please enter a whole number.");
+                }
+                catch(InputMismatchException exception)
+                {
+                    System.out.println("\nPlease enter a whole number.");
+                }
+                catch(Exception exception)
+                {
+                    System.out.println("\nAn unexpected error occurred. Please try again.");
+                }
             }
-            int value = scanner.nextInt();
-            scanner.nextLine(); // consume leftover newline so next input works correctly
-            return value;
-    }
+        }
 
     /**
      * Reads a non-empty string from the user.
@@ -64,17 +78,28 @@ public class Inputs
      */
     public static String readString(String prompt)
     {
-        String input = "";
-        while(input.isEmpty())
+        while(true)
         {
             System.out.print(prompt + " ");
-            input = scanner.nextLine().trim();
-            if(input.isEmpty())
+            String input = scanner.nextLine().trim();
+
+            try
             {
-                System.out.println("Input cannot be empty. Please try again.");
+                if(input.isEmpty())
+                {
+                    throw new IllegalArgumentException("\nInput cannot be empty. Please try again.");
+                }
+                return input; // valid string
+            }
+            catch(IllegalArgumentException exception)
+            {
+                System.out.println(exception.getMessage());
+            }
+            catch(Exception exception)
+            {
+                System.out.println("\nUnexpected error occurred. Please try again.");
             }
         }
-        return input;
     }
 
     /**
@@ -89,19 +114,33 @@ public class Inputs
      */
     public static boolean confirm(String prompt)
     {
-        while(true)
+        while (true)
         {
             System.out.print(prompt + " (y/n): ");
             String input = scanner.nextLine().trim().toLowerCase();
-            if(input.equals("y") || input.equals("yes"))
+
+            try
             {
-                return true;
+                if (input.equals("y") || input.equals("yes"))
+                {
+                    return true;
+                }
+                if (input.equals("n") || input.equals("no"))
+                {
+                    return false;
+                }
+
+                // If input is neither yes nor no, treat it as invalid
+                throw new IllegalArgumentException("\nInvalid response. Please enter 'y' or 'n'.");
             }
-            if(input.equals("n") || input.equals("no"))
+            catch (IllegalArgumentException exception)
             {
-                return false;
+                System.out.println(exception.getMessage());
             }
-            System.out.println("Invalid response. Please enter 'y' or 'n'.");
+            catch (Exception exception)
+            {
+                System.out.println("\nUnexpected error occurred. Please try again.");
+            }
         }
     }
 
@@ -149,13 +188,13 @@ public class Inputs
                 }
                 else
                 {
-                    System.out.println("Date must be in the future and within 3 months from today.");
+                    System.out.println("\nDate must be in the future and within 3 months from today.");
                 }
             }
-            catch(DateTimeParseException error)
+            catch(DateTimeParseException exception)
             {
                 // If parsing fails, inform the user and retry
-                System.out.println("Invalid format. Please enter the date as DD/MM/YYYY.");
+                System.out.println("\nInvalid format. Please enter the date as DD/MM/YYYY.");
             }
         }
     }

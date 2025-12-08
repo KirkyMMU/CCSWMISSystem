@@ -134,7 +134,7 @@ public class DataManager
     {
         if(students.isEmpty())
         {
-            System.out.println("\nNo students found.\n");
+            System.out.println("\nNo students found.");
         }
         else
         {
@@ -241,7 +241,7 @@ public class DataManager
     {
         if(staffMembers.isEmpty())
         {
-            System.out.println("\nNo staff members found.\n");
+            System.out.println("\nNo staff members found.");
         }
         else
         {
@@ -296,7 +296,7 @@ public class DataManager
             else
             {
                 // If code exists, don't add duplicate
-                System.out.println("Course with code: " + course.getCode() + " already exists. Using existing course: " + existing.getTitle());
+                System.out.println("\nCourse with code: " + course.getCode() + " already exists. Using existing course: " + existing.getTitle());
                 return false;
             }
         }
@@ -319,7 +319,7 @@ public class DataManager
         }
         else
         {
-            System.out.println("\nNo Courses found.\n");
+            System.out.println("\nNo Courses found.");
             return courses;
         }
     }
@@ -374,12 +374,12 @@ public class DataManager
                     if(student.getCourse() != null && student.getCourse().getCode().equalsIgnoreCase(code))
                     {
                         student.setCourse(null);
-                    }
-                }
+                    } // if
+                } // for
                 courses.remove(i);
                 return true;
-            }
-        }
+            } // if
+        } // for
         return false;
-    }
-}
+    } // boolean
+} // class

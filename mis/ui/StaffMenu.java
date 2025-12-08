@@ -37,24 +37,29 @@ public class StaffMenu
     // Displays the staff menu and routes user choices to appropriate actions
     public void show()
     {
-        System.out.println("\n ----- Staff Menu -----\n");
-        System.out.println("1. Add Staff");
-        System.out.println("2. List Staff");
-        System.out.println("3. Assign Task");
-        System.out.println("4. Remove Staff");
-        System.out.println("5. Back");
-
-        int choice = Inputs.readInt("\nChoose an option (1-5):");
-
-        switch(choice)
+        int choice;
+        do
         {
-            case 1 -> addStaff();
-            case 2 -> manager.listStaff();
-            case 3 -> assignTask();
-            case 4 -> removeStaff();
-            case 5 -> System.out.println("\nReturning to Main Menu...");
-            default -> System.out.println("\nInvalid option.");
+            System.out.println("\n ----- Staff Menu -----\n");
+            System.out.println("1. Add Staff");
+            System.out.println("2. List Staff");
+            System.out.println("3. Assign Task");
+            System.out.println("4. Remove Staff");
+            System.out.println("5. Back");
+
+            choice = Inputs.readInt("\nChoose an option (1-5):");
+
+            switch(choice)
+            {
+                case 1 -> { addStaff(); return; }
+                case 2 -> { manager.listStaff(); return; }
+                case 3 -> { assignTask(); return; }
+                case 4 -> { removeStaff(); return; }
+                case 5 -> { System.out.println("\nReturning to Main Menu..."); return; }
+                default -> System.out.println("\nInvalid option.");
+            }
         }
+        while(choice != 5);
     }
 
     /**

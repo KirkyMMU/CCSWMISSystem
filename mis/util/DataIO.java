@@ -33,7 +33,7 @@ public class DataIO
      * 
      * <p>Format examples:
      * <ul>
-     *   <li>Student: {@code STUDENT|id|name|email|courseCode|gradesCSV}</li>
+     *   <li>Student: {@code STUDENT|id|name|email|courseCode|gradesCSV|attendancePercentage}</li>
      *   <li>Staff: {@code STAFF|id|name|email|role|department}</li>
      *   <li>Course: {@code COURSE|code|title|enrolledIdsCSV}</li>
      * </ul>
@@ -82,9 +82,9 @@ public class DataIO
 
             System.out.println("\nData saved successfully to " + path);
         }
-        catch(IOException error)
+        catch(IOException exception)
         {
-            System.out.println("\nError saving data: " + error.getMessage());
+            System.out.println("\nError saving data: " + exception.getMessage());
         }
     }
 
@@ -126,19 +126,19 @@ public class DataIO
                         // Link student to existing course if code is provided
                         if(!courseCode.isEmpty())
                         {
-                            Course c = manager.findCourseByCode(courseCode);
-                            if (c != null)
+                            Course course = manager.findCourseByCode(courseCode);
+                            if (course != null)
                             {
-                                student.setCourse(c);
+                                student.setCourse(course);
                             }
                         }
 
                         // Parse grades if present
-                        if(parts.length > 5 && !parts[5].isEmpty())
+                        if(!parts[5].isEmpty())
                         {
-                            for(String g : parts[5].split(","))
+                            for(String grade : parts[5].split(","))
                             {
-                                student.addGrade(Integer.parseInt(g));
+                                student.addGrade(Integer.parseInt(grade));
                             }
                         }
 
@@ -168,19 +168,19 @@ public class DataIO
                         // Parse enrolled student IDs if present 
                         if(parts.length > 3 && !parts[3].isEmpty())
                         {
-                            for(String idStr : parts[3].split(","))
+                            for(String idString : parts[3].split(","))
                             {
-                                course.enrolStudent(Integer.parseInt(idStr));
+                                course.enrolStudent(Integer.parseInt(idString));
                             } // for
                         } // if
-                    } // case "COURSE"
+                    } // case
                 } // switch
             } // while
             System.out.println("\nData loaded successfully from " + path);
         } // try
-        catch(IOException error)
+        catch(IOException exception)
         {
-            System.out.println("\nError loading data: " + error.getMessage());
-        }
-    }
-}
+            System.out.println("\nError loading data: " + exception.getMessage());
+        } // catch
+    } // loadFromFile
+} // class
