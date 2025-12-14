@@ -4,10 +4,12 @@ A simplified Management Information System (MIS) built in Java designed for use 
 ## How to Run
 1. Open the project in your IDE.
 2. Compile the entry point:
-```bash
-javac mis/ui/MISSystem.java
+
+`javac mis/ui/MISSystem.java`
+
 3. Run the programme:
-java mis.ui.MISSystem
+
+`java mis.ui.MISSystem`
 
 ## Usage
     -   Navigate menus to add students, staff and courses.
