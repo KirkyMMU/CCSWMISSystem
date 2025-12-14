@@ -23,8 +23,6 @@ import mis.services.DataManager;
  *       ensuring encapsulation of grade logic within the Student class.</li>
  *   <li>Uses {@link StringBuilder} for efficient string concatenation when
  *       building the report output.</li>
- *   <li>Currently outputs a plain text report. Future enhancements could
- *       include formatted tables or export to CSV/HTML formats.</li>
  * </ul>
  * </p>
  */
@@ -56,6 +54,13 @@ public class GradesReport implements Reportable
     {
         // Start with a header line
         StringBuilder builder = new StringBuilder("\n--- Grades Report ---\n");
+
+        // Handle case where no students exist
+        if(manager.getStudents().isEmpty())
+        {
+            builder.append("No students found.");
+            return builder.toString();
+        }
 
         // Iterate through all students in the DataManager
         for(Student student : manager.getStudents())

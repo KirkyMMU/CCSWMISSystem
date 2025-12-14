@@ -1,42 +1,39 @@
 import mis.models.*;
 import mis.services.DataManager;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link GradesReport}.
  * 
- * <p>These tests verify that the GradesReport class correctly generates
- * grade summaries for students including handling of average calculation,
- * missing grades and course information.</p>
- *
- * <p><b>Design Notes:</b>
+ * <p>This test suite verifies that the GradesReport class correctly
+ * generates grade summaries for students including:</p>
  * <ul>
- *   <li>Uses a fresh {@link DataManager} in each test to ensure isolation.</li>
- *   <li>Students are created with fixed grade values to produce predictable averages.</li>
- *   <li>Tests verify both normal and edge cases (no grades, no course).</li>
- *   <li>Assertions check substrings in the report output rather than exact formatting
- *       allowing flexibility in presentation.</li>
+ *   <li>Per-student average grade calculation</li>
+ *   <li>Handling of students with no grades</li>
+ *   <li>Handling of students without assigned courses</li>
+ *   <li>Graceful behaviour when no students exist</li>
  * </ul>
- * </p>
+ *
+ * <p><b>Design notes:</b></p>
+ * <ul>
+ *   <li>Each test uses a fresh {@link DataManager} instance.</li>
+ *   <li>Grades are explicitly assigned to ensure predictable averages.</li>
+ *   <li>Assertions focus on meaningful substrings rather than exact formatting.</li>
+ *   <li>Tests are organised using {@link Nested} classes to group related scenarios.</li>
+ * </ul>
  */
-public class GradesReportTests
+class GradesReportTests
 {
     private DataManager manager;
 
     /**
-     * Sets up a DataManager with sample students and courses before each test.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a new {@link DataManager}.</li>
-     *   <li>Add a course (CS101).</li>
-     *   <li>Create students with fixed grades and assign them to the course.</li>
-     *   <li>Add students and course to the manager.</li>
-     * </ol>
-     * </p>
+     * Sets up a DataManager populated with sample students and courses 
+     * before each test.
      */
     @BeforeEach
     void setUp()
@@ -64,74 +61,162 @@ public class GradesReportTests
     }
 
     /**
-     * Verifies that the report includes each student's name, ID and average grade.
-     *
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a {@link GradesReport} with the test manager.</li>
-     *   <li>Generate the report string.</li>
-     *   <li>Assert that student names, IDs and average grades appear in the output.</li>
-     * </ol>
-     * </p>
+     * Tests related to per-student grade output
+     * and average grade calculation.
      */
-    @Test
-    void testReportIncludesStudentGrades()
+    @Nested
+    class StudentGradeTests
     {
-        GradesReport report = new GradesReport(manager);
-        String output = report.generateReport();
+        @Test
+        void reportIncludesStudentNamesIdsAndAverages()
+        {
+            GradesReport report = new GradesReport(manager);
+            String output = report.generateReport();
 
-        assertTrue(output.contains("Alice Smith"));
-        assertTrue(output.contains("ID: 101"));
-        assertTrue(output.contains("Average Grade: 7.5")); // (7+8)/2
-        assertTrue(output.contains("Bob Jones"));
-        assertTrue(output.contains("ID: 102"));
-        assertTrue(output.contains("Average Grade: 6.5")); // (6+7)/2
+            assertAll
+            (
+                () -> assertTrue(output.contains("Alice Smith")),
+                () -> assertTrue(output.contains("ID: 101")),
+                () -> assertTrue(output.contains("Average Grade: 7.5")), // (7+8)/2
+                () -> assertTrue(output.contains("Bob Jones")),
+                () -> assertTrue(output.contains("ID: 102")),
+                () -> assertTrue(output.contains("Average Grade: 6.5")) // (6+7)/2
+            );
+        }
+
+        @Test
+        void reportHandlesSingleGrade()
+        {
+            Student eve = new Student(105, "Eve", "eve@example.com");
+            eve.addGrade(9);
+            manager.addStudent(eve);
+
+            GradesReport report = new GradesReport(manager);
+            String output = report.generateReport();
+
+            assertAll
+            (
+                () -> assertTrue(output.contains("Eve")),
+                () -> assertTrue(output.contains("Average Grade: 9.0"))
+            );
+        }
     }
 
     /**
-     * Verifies that the report shows "N/A" when a student has no grades.
-     *
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a {@link GradesReport} with the test manager.</li>
-     *   <li>Generate the report string.</li>
-     *   <li>Assert that Carol's entry contains "N/A".</li>
-     * </ol>
-     * </p>
+     * Tests related to students who have no grades recorded.
      */
-    @Test
-    void testReportHandlesNoGrades()
+    @Nested
+    class NoGradesTests
     {
-        GradesReport report = new GradesReport(manager);
-        String output = report.generateReport();
+        @Test
+        void reportShowsNAForStudentsWithNoGrades()
+        {
+            GradesReport report = new GradesReport(manager);
+            String output = report.generateReport();
 
-        assertTrue(output.contains("Carol Lee"));
-        assertTrue(output.contains("N/A"));
+            assertAll
+            (
+                () -> assertTrue(output.contains("Carol Lee")),
+                () -> assertTrue(output.contains("N/A"))
+            );
+        }
+
+        @Test
+        void mixedStudentStates()
+        {
+            Student grace = new Student(107, "Grace", "grace@example.com");
+            // no grades, no course
+            manager.addStudent(grace);
+
+            GradesReport report = new GradesReport(manager);
+            String output = report.generateReport();
+
+            assertAll
+            (
+                () -> assertTrue(output.contains("Grace")),
+                () -> assertTrue(output.contains("No course")),
+                () -> assertTrue(output.contains("N/A"))
+            );
+        }
     }
 
     /**
-     * Verifies that the report shows "No course" when a student is not enrolled.
-     *
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a new student without assigning a course.</li>
-     *   <li>Add the student to the manager.</li>
-     *   <li>Generate the report string.</li>
-     *   <li>Assert that the student's entry contains "No course".</li>
-     * </ol>
-     * </p>
-     */  
-    @Test
-    void testReportHandlesNoCourse()
+     * Tests related to students who are not enrolled
+     * on any course.
+     */
+    @Nested
+    class NoCourseTests
     {
-        Student dave = new Student(104, "Dave White", "dave@example.com");
-        dave.addGrade(9);
-        manager.addStudent(dave);
+        @Test
+        void reportShowsNoCourseWhenStudentNotEnrolled()
+        {
+            Student dave = new Student(104, "Dave White", "dave@example.com");
+            dave.addGrade(9);
+            manager.addStudent(dave);
 
-        GradesReport report = new GradesReport(manager);
-        String output = report.generateReport();
+            GradesReport report = new GradesReport(manager);
+            String output = report.generateReport();
 
-        assertTrue(output.contains("Dave White"));
-        assertTrue(output.contains("No course"));
+            assertAll
+            (
+                () -> assertTrue(output.contains("Dave White")),
+                () -> assertTrue(output.contains("No course"))
+            );
+        }
+
+        @Test
+        void reportHandlesCourseNotInManager()
+        {
+            Course orphanCourse = new Course("CS999", "Orphan Course");
+
+            Student frank = new Student(106, "Frank", "frank@example.com");
+            frank.addGrade(8);
+            frank.setCourse(orphanCourse);
+            manager.addStudent(frank);
+
+            GradesReport report = new GradesReport(manager);
+            String output = report.generateReport();
+
+            assertAll
+            (
+                () -> assertTrue(output.contains("Frank")),
+                () -> assertTrue(output.contains("CS999"))
+            );
+        }
+    }
+
+    /**
+     * Tests covering edge cases where no student
+     * data exists in the system.
+     */
+    @Nested
+    class EmptyDataTests
+    {
+        @Test
+        void reportHandlesNoStudentsGracefully()
+        {
+            DataManager emptyManager = new DataManager();
+            GradesReport report = new GradesReport(emptyManager);
+            String output = report.generateReport();
+
+            assertTrue(output.contains("No students found."));
+        }
+    }
+
+    /**
+     * Tests related to the structural elements
+     * of the grades report output.
+     */
+    @Nested
+    class ReportStructureTests
+    {
+        @Test
+        void reportContainsHeader()
+        {
+            GradesReport report = new GradesReport(manager);
+            String output = report.generateReport();
+
+            assertTrue(output.contains("--- Grades Report ---"));
+        }
     }
 }

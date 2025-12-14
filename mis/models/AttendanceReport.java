@@ -3,23 +3,28 @@ package mis.models;
 import mis.services.DataManager;
 
 /**
- * AttendanceReport is an implementation of the {@link Reportable}
- * interface designed to generate reports related to student attendance. 
+ * Generates a formatted report of student attendance statistics.
  *
- * <p>This class queries the {@link DataManager} for all students and
- * displays their attendance percentages. Attendance values are stored
- * per student and persisted via {@link mis.util.DataIO}.</p>
- *
- * <p><b>Design notes:</b>
+ * <p>{@code AttendanceReport} implements the {@link Reportable} interface
+ * and queries the {@link DataManager} for all students and courses. It
+ * produces a multi‑section report including:</p>
  * <ul>
- *   <li>Attendance values are generated when students are created and
- *       typically fall between 85–100%, with 100% being common.</li>
- *   <li>Reports are formatted as a readable string, showing each
- *       student's ID, name, and attendance percentage.</li>
- *   <li>Future versions may include averages by course or highlight
- *       outliers.</li>
+ *   <li>Each student's ID, name, and attendance percentage.</li>
+ *   <li>Average attendance per course (if courses have enrolled students).</li>
+ *   <li>An overall average attendance across all students in the system.</li>
  * </ul>
- * </p>
+ *
+ * <p><b>Design notes:</b></p>
+ * <ul>
+ *   <li>Attendance values are stored per student and persisted via
+ *       {@link mis.util.DataIO}.</li>
+ *   <li>Percentages are formatted to one decimal place followed by a
+ *       percent sign.</li>
+ *   <li>If no students exist, the report indicates that overall attendance
+ *       is not available.</li>
+ *   <li>Course averages are only shown if at least one student is enrolled
+ *       on the course.</li>
+ * </ul>
  */
 public class AttendanceReport implements Reportable
 {

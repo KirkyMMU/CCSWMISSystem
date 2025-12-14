@@ -1,52 +1,42 @@
 import mis.models.*;
 import mis.services.DataManager;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for AttendanceReport.
- * 
- * <p>These tests verify that the AttendanceReport class correctly generates
- * attendance reports including per-student details, course-level averages,
- * and overall averages. They also ensure the report handles empty datasets
- * gracefully.</p>
- * 
- * <p><b>Design Notes:</b>
+ * Unit tests for {@link AttendanceReport}.
+ *
+ * <p>This test suite verifies that the AttendanceReport class correctly
+ * generates attendance summaries at multiple levels including:</p>
  * <ul>
- *   <li>Tests use a fresh {@link DataManager} instance for isolation ensuring
- *       no state leaks between test cases.</li>
- *   <li>Attendance percentages are explicitly set to fixed values so that
- *       assertions can check predictable output rather than randomised data.</li>
- *   <li>Course enrolments are configured in {@link #setUp()} to validate
- *       course-level average calculations.</li>
- *   <li>Assertions focus on verifying that expected substrings appear in the
- *       generated report rather than exact formatting to allow flexibility
- *       in report presentation.</li>
- *   <li>An empty manager scenario is included to confirm graceful handling
- *       when no students exist.</li>
+ *   <li>Per-student attendance output</li>
+ *   <li>Course-level average attendance</li>
+ *   <li>Overall average attendance</li>
+ *   <li>Graceful handling of empty or partial datasets</li>
  * </ul>
- * </p>
+ *
+ * <p><b>Design notes:</b></p>
+ * <ul>
+ *   <li>Each test uses a fresh {@link DataManager} instance to ensure isolation.</li>
+ *   <li>Attendance values are explicitly set to avoid reliance on random data.</li>
+ *   <li>Assertions focus on meaningful substrings rather than exact formatting.</li>
+ *   <li>Tests are organised using {@link Nested} classes to group related scenarios.</li>
+ * </ul>
  */
-public class AttendanceReportTests
+class AttendanceReportTests
 {
     private DataManager manager;
 
     /**
-     * Sets up a fresh DataManager with sample courses and students
-     * before each test. Attendance percentages are explicitly set
-     * to ensure predictable report output.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a new {@link DataManager}.</li>
-     *   <li>Add two courses (CS101, MATH201).</li>
-     *   <li>Create three students with fixed attendance values.</li>
-     *   <li>Assign students to courses and enrol them.</li>
-     *   <li>Add students and courses to the manager.</li>
-     * </ol>
-     * </p>
+     * Sets up a fresh {@link DataManager} populated with sample courses
+     * and students before each test.
+     *
+     * <p>This shared setup ensures consistent test data for all nested
+     * test scenarios.</p>
      */
     @BeforeEach
     void setUp()
@@ -78,94 +68,153 @@ public class AttendanceReportTests
     }
 
     /**
-     * Verifies that the generated report includes each student's
-     * name and attendance percentage.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create an {@link AttendanceReport} with the test manager.</li>
-     *   <li>Generate the report string.</li>
-     *   <li>Assert that names and attendance values appear in the output.</li>
-     * </ol>
-     * </p>
+     * Tests related to per-student attendance information
+     * displayed in the report output.
      */
-    @Test
-    void testReportIncludesStudentAttendance()
+    @Nested
+    class StudentAttendanceTests
     {
-        AttendanceReport report = new AttendanceReport(manager);
-        String output = report.generateReport();
+        @Test
+        void reportIncludesStudentAttendance()
+        {
+            AttendanceReport report = new AttendanceReport(manager);
+            String output = report.generateReport();
 
-        assertTrue(output.contains("Alice Smith"));
-        assertTrue(output.contains("98.5%"));
-        assertTrue(output.contains("Bob Jones"));
-        assertTrue(output.contains("87.4%"));
-        assertTrue(output.contains("Carol Lee"));
-        assertTrue(output.contains("100.0%"));
+            assertAll
+            (
+                () -> assertTrue(output.contains("Alice Smith")),
+                () -> assertTrue(output.contains("98.5%")),
+                () -> assertTrue(output.contains("Bob Jones")),
+                () -> assertTrue(output.contains("87.4%")),
+                () -> assertTrue(output.contains("Carol Lee")),
+                () -> assertTrue(output.contains("100.0%"))
+            );
+        }
+
+        @Test
+        void attendanceIsFormattedToOneDecimalPlace()
+        {
+            AttendanceReport report = new AttendanceReport(manager);
+            String output = report.generateReport();
+
+            assertAll
+            (
+                () -> assertTrue(output.contains("98.5%")),
+                () -> assertTrue(output.contains("87.4%")),
+                () -> assertTrue(output.contains("100.0%"))
+            );
+        }
     }
 
     /**
-     * Verifies that the generated report includes course-level
-     * average attendance values.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create an {@link AttendanceReport} with the test manager.</li>
-     *   <li>Generate the report string.</li>
-     *   <li>Assert that course average lines appear in the output.</li>
-     * </ol>
-     * </p>
+     * Tests related to course-level average attendance
+     * calculations and output.
      */
-    @Test
-    void testReportIncludesCourseAverages()
+    @Nested
+    class CourseAverageTests
     {
-        AttendanceReport report = new AttendanceReport(manager);
-        String output = report.generateReport();
+        @Test
+        void reportIncludesCourseAverages()
+        {
+            AttendanceReport report = new AttendanceReport(manager);
+            String output = report.generateReport();
 
-        assertTrue(output.contains("Course CS101 Average Attendance"));
-        assertTrue(output.contains("Course MATH201 Average Attendance"));
+            assertAll
+            (
+                () -> assertTrue(output.contains("Course CS101 Average Attendance")),
+                () -> assertTrue(output.contains("Course MATH201 Average Attendance"))
+            );
+        }
+
+        @Test
+        void courseWithNoEnrolledStudentsIsNotIncluded()
+        {
+            Course emptyCourse = new Course("PHY301", "Physics");
+            manager.addCourse(emptyCourse);
+
+            AttendanceReport report = new AttendanceReport(manager);
+            String output = report.generateReport();
+
+            assertFalse(output.contains("Course PHY301 Average Attendance"));
+        }
+
+        @Test
+        void courseAverageSkipsMissingStudent()
+        {
+            Course cs101 = manager.getCourses().get(0);
+            cs101.enrolStudent(999); // ID not in DataManager
+
+            AttendanceReport report = new AttendanceReport(manager);
+            String output = report.generateReport();
+
+            assertTrue(output.contains("Course CS101 Average Attendance"));
+        }
     }
 
     /**
-     * Verifies that the generated report includes the overall
-     * average attendance across all students.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create an {@link AttendanceReport} with the test manager.</li>
-     *   <li>Generate the report string.</li>
-     *   <li>Assert that the overall average line appears in the output.</li>
-     * </ol>
-     * </p>
+     * Tests related to the overall average attendance
+     * calculated across all students.
      */
-    @Test
-    void testReportIncludesOverallAverage()
+    @Nested
+    class OverallAverageTests
     {
-        AttendanceReport report = new AttendanceReport(manager);
-        String output = report.generateReport();
+        @Test
+        void reportIncludesOverallAverage()
+        {
+            AttendanceReport report = new AttendanceReport(manager);
+            String output = report.generateReport();
 
-        assertTrue(output.contains("Overall Average Attendance"));
+            assertTrue(output.contains("Overall Average Attendance"));
+        }
     }
 
     /**
-     * Verifies that the report handles the case where no students
-     * exist in the DataManager and produces a clear message.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create an empty {@link DataManager}.</li>
-     *   <li>Create an {@link AttendanceReport} with the empty manager.</li>
-     *   <li>Generate the report string.</li>
-     *   <li>Assert that the output contains "No students found".</li>
-     * </ol>
-     * </p>
+     * Tests covering edge cases where data is missing
+     * or partially populated.
      */
-    @Test
-    void testReportHandlesNoStudents()
+    @Nested
+    class EmptyDataTests
     {
-        DataManager emptyManager = new DataManager();
-        AttendanceReport report = new AttendanceReport(emptyManager);
-        String output = report.generateReport();
+        @Test
+        void reportHandlesNoStudents()
+        {
+            DataManager emptyManager = new DataManager();
+            AttendanceReport report = new AttendanceReport(emptyManager);
+            String output = report.generateReport();
 
-        assertTrue(output.contains("No students found"));
+            assertTrue(output.contains("No students found"));
+        }
+
+        @Test
+        void courseAveragesSectionNotShownWhenNoCourses()
+        {
+            DataManager noCoursesManager = new DataManager();
+
+            Student student = new Student(1, "Test Student", "test@example.com");
+            student.setAttendancePercentage(90);
+            noCoursesManager.addStudent(student);
+
+            AttendanceReport report = new AttendanceReport(noCoursesManager);
+            String output = report.generateReport();
+
+            assertFalse(output.contains("--- Course Averages ---"));
+        }
+    }
+
+    /**
+     * Tests related to the structural elements
+     * of the report output.
+     */
+    @Nested
+    class ReportStructureTests
+    {
+        @Test
+        void reportContainsHeader()
+        {
+            AttendanceReport report = new AttendanceReport(manager);
+            String output = report.generateReport();
+
+            assertTrue(output.contains("--- Attendance Report ---"));
+        }
     }
 }

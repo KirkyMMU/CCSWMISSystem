@@ -8,28 +8,49 @@ import java.time.format.DateTimeParseException;
 
 /**
  * Utility class for reading validated user input from the console.
- * 
- * <p>Provides static helper methods to safely capture user input:
+ *
+ * <p>Provides static helper methods to safely capture and validate user input:</p>
  * <ul>
  *   <li>{@link #readInt(String)} for integers</li>
  *   <li>{@link #readString(String)} for non-empty strings</li>
  *   <li>{@link #confirm(String)} for yes/no confirmations</li>
- *   <li>{@link #readValidDate(String)} for dates in DD/MM/YYYY format</li>
+ *   <li>{@link #readValidDate(String)} for dates in {@code dd/MM/yyyy} format</li>
  * </ul>
- * </p>
- * 
- * <p><b>Design notes:</b>
+ *
+ * <p><b>Key features:</b></p>
  * <ul>
  *   <li>Uses a single shared {@link Scanner} instance bound to {@code System.in}.</li>
  *   <li>All methods loop until valid input is provided.</li>
- *   <li>Validation rules are explained inline for clarity.</li>
+ *   <li>Supports an escape command: entering {@code "menu"} at any prompt
+ *       throws a {@link MenuEscapeException} to return control to the caller.</li>
+ *   <li>Validation rules are enforced inline (e.g. non-empty strings, numeric parsing,
+ *       date range checks).</li>
+ *   <li>Percentages and dates are formatted consistently for user clarity.</li>
  * </ul>
- * </p>
+ *
+ * <p><b>Testing notes:</b></p>
+ * <ul>
+ *   <li>A package-private {@code setScanner(Scanner)} method exists to allow
+ *       unit tests to rebind the scanner to a simulated {@code System.in} stream.</li>
+ *   <li>This method is not intended for production use.</li>
+ * </ul>
  */
 public class Inputs
     {
         // Shared Scanner instance for reading console input.
         private static Scanner scanner = new Scanner(System.in);
+
+        /**
+         * Allows tests to reset the scanner to point at the current System.in.
+         * <p>This is package-private so it can be called from a helper in the same package,
+         * but is not part of the public API for production code.</p>
+         *
+         * @param newScanner a new Scanner instance bound to System.in
+         */
+        static void setScanner(Scanner newScanner)
+        {
+            scanner = newScanner;
+        }
 
         /**
          * Reads a valid integer from the user.
@@ -126,30 +147,35 @@ public class Inputs
      */
     public static boolean confirm(String prompt)
     {
-        while (true)
+        while(true)
         {
             System.out.print(prompt + " (y/n): ");
             String input = scanner.nextLine().trim().toLowerCase();
 
+            if(input.equalsIgnoreCase("menu"))
+            {
+                throw new MenuEscapeException();
+            }
+
             try
             {
-                if (input.equals("y") || input.equals("yes"))
+                if(input.equals("y") || input.equals("yes"))
                 {
                     return true;
                 }
-                if (input.equals("n") || input.equals("no"))
+                if(input.equals("n") || input.equals("no"))
                 {
                     return false;
                 }
 
-                // If input is neither yes nor no, treat it as invalid
+                // If input is neither yes nor no treat it as invalid
                 throw new IllegalArgumentException("\nInvalid response. Please enter 'y' or 'n'.");
             }
-            catch (IllegalArgumentException exception)
+            catch(IllegalArgumentException exception)
             {
                 System.out.println(exception.getMessage());
             }
-            catch (Exception exception)
+            catch(Exception exception)
             {
                 System.out.println("\nUnexpected error occurred. Please try again.");
             }

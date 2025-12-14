@@ -3,26 +3,44 @@ package mis.util;
 import mis.services.DataManager;
 import mis.models.*;
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Utility class for saving and loading MIS system data to and from text files.
- * 
- * <p>Provides static methods to persist the state of {@link DataManager} and
- * reconstruct it later. Data is stored in a simple line-based format where
- * each line begins with a record type identifier ("STUDENT", "STAFF", "COURSE")
- * followed by pipe-delimited fields.</p>
- * 
- * <p><b>Design notes:</b>
+ *
+ * <p>{@code DataIO} provides static methods to persist the state of a
+ * {@link mis.services.DataManager} and reconstruct it later. Data is stored
+ * in a simple line‑based format where each line begins with a record type
+ * identifier ({@code "STUDENT"}, {@code "STAFF"}, {@code "COURSE"}) followed
+ * by pipe‑delimited fields.</p>
+ *
+ * <p><b>Key features:</b></p>
  * <ul>
- *   <li>Uses {@link PrintWriter} and {@link FileWriter} for saving data.</li>
- *   <li>Uses {@link BufferedReader} and {@link FileReader} for loading data.</li>
- *   <li>Each entity type (Student, Staff, Course) is serialised into a single line.</li>
- *   <li>Grades and enrolled student IDs are stored as comma-separated values.</li>
+ *   <li>Students, staff and courses are each serialised into a single line.</li>
+ *   <li>Grades, staff tasks and enrolled student IDs are stored as
+ *       comma‑separated values.</li>
+ *   <li>Attendance is stored as a double value.</li>
+ *   <li>Uses {@link PrintWriter}/{@link FileWriter} for saving and
+ *       {@link BufferedReader}/{@link FileReader} for loading.</li>
  *   <li>Exceptions are caught and reported to the console without halting execution.</li>
  * </ul>
- * </p>
+ *
+ * <p><b>Loading strategy:</b></p>
+ * <ul>
+ *   <li>Data is read into memory and processed in two passes to ensure
+ *       referential integrity.</li>
+ *   <li><b>Pass 1:</b> Load all courses so they exist before students reference them.</li>
+ *   <li><b>Pass 2:</b> Load students and staff, linking students to courses
+ *       and restoring grades, attendance and staff tasks.</li>
+ * </ul>
+ *
+ * <p><b>Format examples:</b></p>
+ * <ul>
+ *   <li>Student: {@code STUDENT|id|name|email|courseCode|gradesCSV|attendancePercentage}</li>
+ *   <li>Staff: {@code STAFF|id|name|email|role|department|tasksCSV}</li>
+ *   <li>Course: {@code COURSE|code|title|enrolledIdsCSV}</li>
+ * </ul>
  */
-
 public class DataIO
 {
     /**
@@ -89,31 +107,85 @@ public class DataIO
     }
 
     /**
-     * Loads system data from a text file into the given DataManager.
-     * 
-     * <p>Reads each line, splits it into fields and reconstructs the appropriate
-     * entity (Student, Staff, Course). Students may be linked to existing courses
-     * and grades/enrolled IDs are parsed from comma-separated values.</p>
-     * 
+     * Loads system data from a text file into the given {@link DataManager}.
+     *
+     * <p>This method uses a two-pass strategy to ensure referential integrity:</p>
+     * <ul>
+     *   <li><b>Pass 1:</b> Load all {@code COURSE} records first so that courses exist
+     *       before students reference them.</li>
+     *   <li><b>Pass 2:</b> Load {@code STUDENT} and {@code STAFF} records, linking
+     *       students to courses and restoring grades, attendance, and staff tasks.</li>
+     * </ul>
+     *
+     * <p>File format expectations:</p>
+     * <ul>
+     *   <li>Student: {@code STUDENT|id|name|email|courseCode|gradesCSV|attendancePercentage}</li>
+     *   <li>Staff: {@code STAFF|id|name|email|role|department|tasksCSV}</li>
+     *   <li>Course: {@code COURSE|code|title|enrolledIdsCSV}</li>
+     * </ul>
+     *
+     * <p><b>Design Notes:</b></p>
+     * <ul>
+     *   <li>Grades and enrolled IDs are comma-separated.</li>
+     *   <li>Attendance is stored as a double value.</li>
+     *   <li>Tasks are stored as comma-separated strings.</li>
+     *   <li>Errors are caught and reported to the console without halting execution.</li>
+     * </ul>
+     *
      * @param manager the {@link DataManager} to populate with loaded data
-     * @param path    the file path to load to
+     * @param path    the file path to load from
      */
     public static void loadFromFile(DataManager manager, String path)
     {
-        try(BufferedReader reader = new BufferedReader(new FileReader(path)))
+        try
         {
-            String line;
+            // Read all lines in memory first so they can be processed in 2 passes
+            ArrayList<String> lines = new ArrayList<>();
 
-            // Read file line by line
-            while((line = reader.readLine()) != null)
+            try(BufferedReader reader = new BufferedReader(new FileReader(path)))
             {
-                String[] parts = line.split("\\|"); // Split fields by pipe delimiter
+                String line;
+                while((line = reader.readLine()) != null)
+                {
+                    lines.add(line);
+                }
+            }
+
+            // ---------- PASS 1: Load COURSES ----------
+            // Courses must be loaded first so that students can be linked to them later
+            for(String line : lines)
+            {
+                String[] parts = line.split("\\|");
+
+                if(parts[0].equals("COURSE"))
+                {
+                    String code = parts[1];
+                    String title = parts[2];
+
+                    Course course = new Course(code, title);
+                    manager.addCourse(course);
+
+                    // Restore enrolled student IDs if present
+                    if(parts.length > 3 && !parts[3].isEmpty())
+                    {
+                        for(String id : parts[3].split(","))
+                        {
+                            course.enrolStudent(Integer.parseInt(id));
+                        }
+                    }
+                }
+            }
+
+            // ---------- PASS 2: Load STUDENTS and STAFF ----------
+            // Now that courses exist, students can be linked correctly
+            for(String line : lines)
+            {
+                String[] parts = line.split("\\|");
 
                 switch(parts[0])
                 {
                     case "STUDENT" ->
                     {
-                        // Parse student fields
                         int id = Integer.parseInt(parts[1]);
                         String name = parts[2];
                         String email = parts[3];
@@ -123,17 +195,17 @@ public class DataIO
                         Student student = new Student(id, name, email);
                         student.setAttendancePercentage(attendance);
 
-                        // Link student to existing course if code is provided
+                        // Link student to course if code is provided and course exists
                         if(!courseCode.isEmpty())
                         {
                             Course course = manager.findCourseByCode(courseCode);
-                            if (course != null)
+                            if(course != null)
                             {
                                 student.setCourse(course);
                             }
                         }
 
-                        // Parse grades if present
+                        // Restore grades if present
                         if(!parts[5].isEmpty())
                         {
                             for(String grade : parts[5].split(","))
@@ -141,12 +213,11 @@ public class DataIO
                                 student.addGrade(Integer.parseInt(grade));
                             }
                         }
-
                         manager.addStudent(student);
                     }
+
                     case "STAFF" ->
                     {
-                        // Parse staff fields
                         int id = Integer.parseInt(parts[1]);
                         String name = parts[2];
                         String email = parts[3];
@@ -154,37 +225,20 @@ public class DataIO
                         String department = parts[5];
 
                         Staff staff = new Staff(id, name, email, role, department);
-                        
+
+                        // Restore tasks if present
                         if(parts.length > 6 && !parts[6].isEmpty())
                         {
-                            String[] tasks = parts[6].split(",");
-                            for(String task : tasks)
+                            for(String task : parts[6].split(","))
                             {
                                 staff.getTasks().add(task);
                             }
                         }
                         manager.addStaff(staff);
-                    }
-                    case "COURSE" ->
-                    {
-                        // Parse course fields
-                        String code = parts[1];
-                        String title = parts[2];
-
-                        Course course = new Course(code, title);
-                        manager.addCourse(course);
-
-                        // Parse enrolled student IDs if present 
-                        if(parts.length > 3 && !parts[3].isEmpty())
-                        {
-                            for(String idString : parts[3].split(","))
-                            {
-                                course.enrolStudent(Integer.parseInt(idString));
-                            } // for
-                        } // if
                     } // case
                 } // switch
-            } // while
+            } // for
+
             System.out.println("\nData loaded successfully from " + path);
         } // try
         catch(IOException exception)

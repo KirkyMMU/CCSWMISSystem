@@ -1,70 +1,173 @@
 import mis.models.*;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
+
 import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for the {@link Staff} class.
  * 
- * <p>These tests verify the behaviour of task assignment for staff
- * members, ensuring that deadlines are validated correctly and tasks
- * are refelcted in the staff member's string representation.</p>
- * 
- * <p><b>Design notes:</b>
+ * <p>This test suite verifies staff-specific behaviour within the MIS system,
+ * focusing primarily on task management and staff metadata including:</p>
  * <ul>
- *   <li>Uses JUnit 5 annotations (@Test) and assertions from
- *       {@link org.junit.jupiter.api.Assertions}.</li>
- *   <li>Focusses on the {@link Staff#assignTask(String, LocalDate)} 
- *       method and its impact on {@link Staff#toString()} output.</li>
- *   <li>Tests both valid and invalid deadline scenarios.</li>
+ *   <li>Task assignment with valid and invalid deadlines</li>
+ *   <li>Handling of multiple tasks</li>
+ *   <li>Task removal behaviour</li>
+ *   <li>CSV output for persistence</li>
+ *   <li>Role and department management</li>
  * </ul>
- * </p>
+ *
+ * <p><b>Design notes:</b></p>
+ * <ul>
+ *   <li>Each test creates its own {@link Staff} instance to ensure isolation.</li>
+ *   <li>Deadline validation is tested using relative dates.</li>
+ *   <li>Assertions focus on observable behaviour rather than internal state.</li>
+ *   <li>Tests are organised using {@link Nested} classes to group related scenarios.</li>
+ * </ul>
  */
-public class StaffTests
+class StaffTests
 {
     /**
-     * Verifies that assigning a valid task with a future deadline succeeds.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a {@link Staff} instance.</li>
-     *   <li>Assign a task with a deadline 7 days in the future.</li>
-     *   <li>Assert that the staff member's string representation contains
-     *       the task description.</li>
-     * </ol>
-     * </p>
+     * Tests related to assigning tasks to staff members
+     * and validating task deadlines.
      */
-    @Test
-    void testAssignValidTask()
+    @Nested
+    class TaskAssignmentTests
     {
-        Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
-        LocalDate deadline = LocalDate.now().plusDays(7);
-        staff.assignTask("Prepare lesson plan", deadline);
+        @Test
+        void assignValidTaskSucceeds()
+        {
+            Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+            LocalDate deadline = LocalDate.now().plusDays(7);
 
-        // Verify that the task appears in the staff member's details
-        assertTrue(staff.toString().contains("Prepare lesson plan"));
+            staff.assignTask("Prepare lesson plan", deadline);
+
+            assertTrue(staff.toString().contains("Prepare lesson plan"));
+        }
+
+        @Test
+        void assignTaskWithPastDeadlineFails()
+        {
+            Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+            LocalDate pastDate = LocalDate.now().minusDays(1);
+
+            staff.assignTask("Review syllabus", pastDate);
+
+            assertTrue(staff.toString().contains("None"));
+        }
+
+        @Test
+        void assignTaskBeyondNinetyDaysFails()
+        {
+            Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+            LocalDate farFuture = LocalDate.now().plusDays(120);
+
+            staff.assignTask("Plan next term", farFuture);
+
+            assertTrue(staff.toString().contains("None"));
+        }
+
+        @Test
+        void assignMultipleTasksSucceeds()
+        {
+            Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+
+            staff.assignTask("Prepare lesson plan", LocalDate.now().plusDays(7));
+            staff.assignTask("Mark coursework", LocalDate.now().plusDays(14));
+
+            String output = staff.toString();
+
+            assertAll
+            (
+                () -> assertTrue(output.contains("Prepare lesson plan")),
+                () -> assertTrue(output.contains("Mark coursework"))
+            );
+        }
     }
 
     /**
-     * Verifies that assigning a task with a past deadline fails.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a {@link Staff} instance.</li>
-     *   <li>Attempt to assign a task with a deadline in the past.</li>
-     *   <li>Assert that the staff memeber's string representation shows
-     *       "None" for the current task, indicating no assignment.</li>
-     * </ol>
-     * </p>
+     * Tests related to removing tasks from a staff member.
      */
-    @Test
-    void testAssignTaskPastDeadlineFails()
+    @Nested
+    class TaskRemovalTests
     {
-        Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
-        LocalDate pastDate = LocalDate.now().minusDays(1);
-        staff.assignTask("Review syllabus", pastDate);
+        @Test
+        void removeExistingTaskSucceeds()
+        {
+            Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+            LocalDate deadline = LocalDate.now().plusDays(7);
 
-        // Verify that no task was assigned
-        assertTrue(staff.toString().contains("None"));
+            staff.assignTask("Prepare lesson plan", deadline);
+            String task = staff.getTasks().get(0);
+
+            boolean removed = staff.removeTask(task);
+
+            assertAll
+            (
+                () -> assertTrue(removed),
+                () -> assertTrue(staff.toString().contains("None"))
+            );
+        }
+
+        @Test
+        void removeNonExistentTaskFails()
+        {
+            Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+
+            boolean removed = staff.removeTask("Non-existent task");
+
+            assertFalse(removed);
+        }
+    }
+
+    /**
+     * Tests related to task persistence and output formatting.
+     */
+    @Nested
+    class TaskOutputTests
+    {
+        @Test
+        void getTasksCSVReturnsCommaSeparatedTasks()
+        {
+            Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+
+            staff.assignTask("Prepare lesson plan", LocalDate.now().plusDays(7));
+            staff.assignTask("Mark coursework", LocalDate.now().plusDays(14));
+
+            String csv = staff.getTasksCSV();
+
+            assertAll
+            (
+                () -> assertTrue(csv.contains("Prepare lesson plan")),
+                () -> assertTrue(csv.contains("Mark coursework")),
+                () -> assertTrue(csv.contains(","))
+            );
+        }
+    }
+
+    /**
+     * Tests related to staff metadata such as role
+     * and department.
+     */
+    @Nested
+    class StaffMetadataTests
+    {
+        @Test
+        void setRoleAndDepartmentUpdatesValues()
+        {
+            Staff staff = new Staff(101, "Bob", "bob@example.com", "Lecturer", "IT");
+
+            staff.setRole("Senior Lecturer");
+            staff.setDepartment("Computer Science");
+
+            assertAll
+            (
+                () -> assertEquals("Senior Lecturer", staff.getRole()),
+                () -> assertEquals("Computer Science", staff.getDepartment())
+            );
+        }
     }
 }

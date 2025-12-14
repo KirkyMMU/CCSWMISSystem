@@ -1,41 +1,39 @@
 import mis.models.*;
 import mis.services.DataManager;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for the {@link DataManager} service class.
- * 
- * <p>These tests verify core student management functionality, including:
+ *
+ * <p>This test suite verifies the core responsibilities of the DataManager
+ * which acts as the central coordination layer of the MIS system. Tests cover:</p>
  * <ul>
- *   <li>Adding students with unique IDs.</li>
- *   <li>Preventing duplicate student IDs.</li>
- *   <li>Removing students and ensuring they are de-enrolled from courses.</li>
- *   <li>Searching for students by ID, including handling of non-existent
- *       IDs.</li>
+ *   <li>Student lifecycle management</li>
+ *   <li>Staff lifecycle management</li>
+ *   <li>Course lifecycle management</li>
+ *   <li>Referential integrity between students and courses</li>
+ *   <li>Defensive handling of invalid or non-existent data</li>
  * </ul>
- * </p>
- * 
- * <p><b>Design notes:</b>
+ *
+ * <p><b>Design notes:</b></p>
  * <ul>
- *   <li>Uses JUnit 5 annotations (Test and BeforeEach)</li>
- *   <li>Each test is independent and uses a fresh {@link DataManager}
- *       instance.</li>
- *   <li>Assertions validate both direct outcomes (return values) and side
- *       effects (e.g. course enrolment updates).</li>
+ *   <li>Each test uses a fresh {@link DataManager} instance to ensure isolation.</li>
+ *   <li>Assertions validate both return values and side effects.</li>
+ *   <li>Tests are organised using {@link Nested} classes to group related scenarios.</li>
  * </ul>
- * </p>
  */
-public class DataManagerTests
+class DataManagerTests
 {
-    // DataManager instance created before each test
     private DataManager manager;
 
     /**
-     * Setup method created before each test.
-     * 
-     * <p>Ensures a clean DataManager instance so tests remain independent
-     * and do not interfere with one another.</p>
+     * Creates a fresh {@link DataManager} instance before each test
+     * to ensure test independence.
      */
     @BeforeEach
     void setup()
@@ -44,86 +42,168 @@ public class DataManagerTests
     }
 
     /**
-     * Verifies that adding a student with a unique ID succeeds.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a new Student.</li>
-     *   <li>Add the student to the DataManager.</li>
-     *   <li>Assert that the addition returns true.</li>
-     *   <li>Assert that the student can be found by ID.</li>
-     * </ol>
-     * </p>
+     * Tests related to adding, removing and searching for students
+     * within the DataManager.
      */
-    @Test
-    void testAddStudentSuccessfully()
+    @Nested
+    class StudentManagementTests
     {
-        Student student = new Student(1, "Alice", "alice@example.com");
-        assertTrue(manager.addStudent(student));
-        assertEquals(student, manager.findStudentById(1));
+        @Test
+        void addStudentSuccessfully()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+
+            assertAll
+            (
+                () -> assertTrue(manager.addStudent(student)),
+                () -> assertEquals(student, manager.findStudentById(1))
+            );
+        }
+
+        @Test
+        void addDuplicateStudentIdFails()
+        {
+            Student student1 = new Student(1, "Alice", "alice@example.com");
+            Student student2 = new Student(1, "Bob", "bob@example.com");
+
+            manager.addStudent(student1);
+
+            assertFalse(manager.addStudent(student2));
+        }
+
+        @Test
+        void addNullStudentFails()
+        {
+            assertFalse(manager.addStudent(null));
+        }
+
+        @Test
+        void removeStudentAlsoDeEnrolsFromCourse()
+        {
+            Course course = new Course("CS101", "Computer Science");
+            Student student = new Student(1, "Alice", "alice@example.com", course);
+
+            manager.addCourse(course);
+            manager.addStudent(student);
+
+            assertAll
+            (
+                () -> assertTrue(manager.removeStudentById(1)),
+                () -> assertFalse(course.getEnrolledIdsCSV().contains("1"))
+            );
+        }
+
+        @Test
+        void removeNonExistentStudentFails()
+        {
+            assertFalse(manager.removeStudentById(999));
+        }
+
+        @Test
+        void findNonExistentStudentReturnsNull()
+        {
+            assertNull(manager.findStudentById(999));
+        }
+
+        @Test
+        void addStudentAddsCourseIfNotTracked()
+        {
+            Course course = new Course("CS101", "Computer Science");
+            Student student = new Student(1, "Alice", "alice@example.com", course);
+
+            manager.addStudent(student);
+
+            assertEquals(course, manager.findCourseByCode("CS101"));
+        }
     }
 
     /**
-     * Verifies that adding a student with a duplicate ID fails.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create two Students with the same ID.</li>
-     *   <li>Add the first student successfully.</li>
-     *   <li>Attempt to add the second student.</li>
-     *   <li>Assert that the addition returns false.</li>
-     * </ol>
-     * </p>
+     * Tests related to adding, removing and searching for staff
+     * members within the DataManager.
      */
-    @Test
-    void testAddDuplicateStudentIdFails()
+    @Nested
+    class StaffManagementTests
     {
-        Student student1 = new Student(1, "Alice", "alice@example.com");
-        Student student2 = new Student(1, "Bob", "bob@example.com");
-        manager.addStudent(student1);
-        assertFalse(manager.addStudent(student2));
+        @Test
+        void addStaffSuccessfully()
+        {
+            Staff staff = new Staff(1, "Bob", "bob@example.com", "Lecturer", "IT");
+
+            assertAll
+            (
+                () -> assertTrue(manager.addStaff(staff)),
+                () -> assertEquals(staff, manager.findStaffById(1))
+            );
+        }
+
+        @Test
+        void addDuplicateStaffFails()
+        {
+            Staff staff1 = new Staff(1, "Bob", "bob@example.com", "Lecturer", "IT");
+            Staff staff2 = new Staff(1, "Jane", "jane@example.com", "Admin", "HR");
+
+            manager.addStaff(staff1);
+
+            assertFalse(manager.addStaff(staff2));
+        }
+
+        @Test
+        void removeNonExistentStaffFails()
+        {
+            assertFalse(manager.removeStaffById(999));
+        }
     }
-
+ 
     /**
-     * Verifies that removing a student also de-enrols them from their
-     * course.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a Course and a Student enrolled in it.</li>
-     *   <li>Add both to the DataManager.</li>
-     *   <li>Remove the student by ID.</li>
-     *   <li>Assert that the removal returns true.</li>
-     *   <li>Assert that the student's ID no longer appears in the course
-     *       enrolment list.</li>
-     * </ol>
-     * </p>
+     * Tests related to adding, removing and locating courses
+     * within the DataManager.
      */
-    @Test
-    void testRemoveStudentAlsoDeEnrolsFromCourse()
+    @Nested
+    class CourseManagementTests
     {
-        Course course = new Course("CS101", "Computer Science");
-        Student student = new Student(1, "Alice", "alice@example.com", course);
-        manager.addCourse(course);
-        manager.addStudent(student);
+        @Test
+        void addCourseSuccessfully()
+        {
+            Course course = new Course("CS101", "Computer Science");
 
-        assertTrue(manager.removeStudentById(1));
-        assertFalse(course.getEnrolledIdsCSV().contains("1"));
-    }
+            assertAll
+            (
+                () -> assertTrue(manager.addCourse(course)),
+                () -> assertEquals(course, manager.findCourseByCode("CS101"))
+            );
+        }
 
-    /**
-     * Verifies that searching for a non-existent student ID returns null.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Search for a student ID that does not exist in the DataManager.</li>
-     *   <li>Assert that the result is null.</li>
-     * </ol>
-     * </p>
-     */
-    @Test
-    void testFindNonExistentStudentReturnsNull()
-    {
-        assertNull(manager.findStudentById(999));
+        @Test
+        void addDuplicateCourseCodeFails()
+        {
+            Course course1 = new Course("CS101", "Computer Science");
+            Course course2 = new Course("cs101", "Duplicate Course");
+
+            manager.addCourse(course1);
+
+            assertFalse(manager.addCourse(course2));
+        }
+
+        @Test
+        void removeCourseNullifiesStudentCourse()
+        {
+            Course course = new Course("CS101", "Computer Science");
+            Student student = new Student(1, "Alice", "alice@example.com", course);
+
+            manager.addCourse(course);
+            manager.addStudent(student);
+
+            assertAll
+            (
+                () -> assertTrue(manager.removeCourseByCode("CS101")),
+                () -> assertNull(student.getCourse())
+            );
+        }
+
+        @Test
+        void removeNonExistentCourseFails()
+        {
+            assertFalse(manager.removeCourseByCode("CS999"));
+        }
     }
 }

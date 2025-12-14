@@ -1,154 +1,220 @@
 import mis.models.*;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for the {@link Student} class.
  * 
- * <p>These tests verify the behaviour of grade management, ensuring
- * that:
+ * <p>This test suite verifies the core behaviour of students within the
+ * MIS system including:</p>
  * <ul>
- *   <li>Valid GCSE-style grades (1-9) are accepted.</li>
- *   <li>Invalid grades below the range are rejected.</li>
- *   <li>Invalid grades above the range are rejected.</li>
+ *   <li>Grade validation and average calculation</li>
+ *   <li>Course enrolment and reassignment</li>
+ *   <li>Attendance generation and management</li>
+ *   <li>CSV output for persistence</li>
+ *   <li>String representation of student details</li>
  * </ul>
- * </p>
- * 
- * <p><b>Design notes:</b>
+ *
+ * <p><b>Design notes:</b></p>
  * <ul>
- *   <li>Uses JUnit 5 annotations (@Test) and assertions from 
- *       {@link org.junit.jupiter.api.Assertions}.</li>
- *   <li>Each test creates a fresh {@link Student} instance to ensure
- *       independence.</li>
- *   <li>Focusses specifically on {@link Student#addGrade(int)} validation
- *       logic.</li>
+ *   <li>Each test creates a fresh {@link Student} instance to ensure isolation.</li>
+ *   <li>Assertions focus on observable behaviour rather than internal state.</li>
+ *   <li>Tests are organised using {@link Nested} classes to group related scenarios.</li>
  * </ul>
- * <p>
  */
-public class StudentTests
+class StudentTests
 {
     /**
-     * Verifies that adding a valid grade succeeds.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a {@link Student} instance.</li>
-     *   <li>Add a grade within the valid range (7).</li>
-     *   <li>Assert that the method returns true, indicating success.</li>
-     * </ol>
-     * </p>
+     * Tests related to adding grades and validating
+     * grade input.
      */
-    @Test
-    void testAddValidGrade()
+    @Nested
+    class GradeValidationTests
     {
-        Student student = new Student(1, "Alice", "alice@example.com");
-        assertTrue(student.addGrade(7));
+        @Test
+        void addValidGradeSucceeds()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+
+            assertTrue(student.addGrade(7));
+        }
+
+        @Test
+        void addInvalidGradeBelowRangeFails()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+
+            assertFalse(student.addGrade(-1));
+        }
+
+        @Test
+        void addInvalidGradeAboveRangeFails()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+
+            assertFalse(student.addGrade(15));
+        }
     }
 
     /**
-     * Verifies that adding a grade below the valid range fails.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a {@link Student} instance.</li>
-     *   <li>Attempt to add a grade below the valid range (-1).</li>
-     *   <li>Assert that the method returns false, indicating rejection.</li>
-     * </ol>
-     * </p>
+     * Tests related to calculating average grades
+     * for students.
      */
-    @Test
-    void testAddInvalidGradeBelowRange()
+    @Nested
+    class GradeAverageTests
     {
-        Student student = new Student(1, "Alice", "alice@example.com");
-        assertFalse(student.addGrade(-1));
+        @Test
+        void calculateAverageWithGradesReturnsCorrectValue()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+            student.addGrade(7);
+            student.addGrade(9);
+
+            assertEquals(8.0, student.calculateAverage());
+        }
+
+        @Test
+        void calculateAverageWithNoGradesReturnsZero()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+
+            assertEquals(0.0, student.calculateAverage());
+        }
     }
 
     /**
-     * Verifies that adding a grade above the valid range fails.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a {@link Student} instance.</li>
-     *   <li>Attempt to add a grade above the valid range (15).</li>
-     *   <li>Assert that the method returns false, indicating rejection.</li>
-     * </ol>
-     * </p>
+     * Tests related to course enrolment,
+     * reassignment and de-enrolment.
      */
-    @Test
-    void testAddInvalidGradeAboveRange()
+    @Nested
+    class CourseAssignmentTests
     {
-        Student student = new Student(1, "Alice", "alice@example.com");
-        assertFalse(student.addGrade(15));
-    }
+        @Test
+        void constructorWithCourseEnrolsStudent()
+        {
+            Course course = new Course("CS101", "Computer Science");
+            Student student = new Student(1, "Alice", "alice@example.com", course);
 
+            assertAll
+            (
+                () -> assertEquals(course, student.getCourse()),
+                () -> assertTrue(course.getEnrolledIdsCSV().contains("1"))
+            );
+        }
 
-    /**
-     * Verifies that calculating the average grade works correctly
-     * when multiple valid grades are present.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a {@link Student} instance.</li>
-     *   <li>Add two valid grades (7 and 9).</li>
-     *   <li>Call {@link Student#calculateAverage()}.</li>
-     *   <li>Assert that the result is 8.0, since (7 + 9) / 2 = 8.0.</li>
-     * </ol>
-     * </p>
-     */
-    @Test
-    void testCalculateAverageWithGrades()
-    {
-        Student student = new Student(1, "Alice", "alice@example.com");
-        student.addGrade(7);
-        student.addGrade(9);
-        assertEquals(8.0, student.calculateAverage());
-    }
+        @Test
+        void setCourseReassignsStudentCorrectly()
+        {
+            Course course1 = new Course("CS101", "Computer Science");
+            Course course2 = new Course("BUS123", "Business");
+            Student student = new Student(1, "Alice", "alice@example.com", course1);
 
-    /**
-     * Verifies that calculating the average with no grades returns 0.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create a new {@link Student} instance with no grades.</li>
-     *   <li>Call {@link Student#calculateAverage()}.</li>
-     *   <li>Assert that the result is 0.0, indicating no grades
-     *       recorded.</li>
-     * </ol>
-     * </p>
-     */
-    @Test
-    void testCalculateAverageNoGradesReturnsZero()
-    {
-        Student student = new Student(1, "Alice", "alice@example.com");
-        assertEquals(0.0, student.calculateAverage());
+            student.setCourse(course2);
+
+            assertAll
+            (
+                () -> assertEquals("BUS123", student.getCourse().getCode()),
+                () -> assertFalse(course1.getEnrolledIdsCSV().contains("1")),
+                () -> assertTrue(course2.getEnrolledIdsCSV().contains("1"))
+            );
+        }
+
+        @Test
+        void setCourseToNullRemovesEnrolment()
+        {
+            Course course = new Course("CS101", "Computer Science");
+            Student student = new Student(1, "Alice", "alice@example.com", course);
+
+            student.setCourse(null);
+
+            assertAll
+            (
+                () -> assertNull(student.getCourse()),
+                () -> assertFalse(course.getEnrolledIdsCSV().contains("1"))
+            );
+        }
     }
 
     /**
-     * Verifies that reassigning a student to a new course updates
-     * enrolment correctly.
-     * 
-     * <p>Steps:
-     * <ol>
-     *   <li>Create two {@link Course} instances (CS101 and BUS123).</li>
-     *   <li>Create a {@link Student} instance initially enrolled in
-     *       CS101.</li>
-     *   <li>Reassign the student to BUS123 using {@link Student#setCourse(Course)}.</li>
-     *   <li>Assert that the student's course is updated to BUS123.</li>
-     *   <li>Assert that the student is removed from CS101's enrolment list.</li>
-     *   <li>Assert that the student is added to BUS123's enrolment list.</li>
-     * </ol>
-     * </p>
+     * Tests related to attendance generation
+     * and manual attendance updates.
      */
-    @Test
-    void testSetCourseReassignsCorrectly()
+    @Nested
+    class AttendanceTests
     {
-        Course course1 = new Course("CS101", "Computer Science");
-        Course course2 = new Course("BUS123", "Business");
-        Student student = new Student(1, "Alice", "alice@example.com", course1);
+        @Test
+        void setAttendancePercentageUpdatesValue()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+            student.setAttendancePercentage(92.5);
 
-        student.setCourse(course2);
-        assertEquals("BUS123", student.getCourse().getCode());
-        assertFalse(course1.getEnrolledIdsCSV().contains("1"));
-        assertTrue(course2.getEnrolledIdsCSV().contains("1"));
+            assertEquals(92.5, student.getAttendancePercentage());
+        }
+
+        @Test
+        void generatedAttendanceIsWithinExpectedRange()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+            double attendance = student.getAttendancePercentage();
+
+            assertAll
+            (
+                () -> assertTrue(attendance >= 85.0),
+                () -> assertTrue(attendance <= 100.0)
+            );
+        }
+    }
+
+    /**
+     * Tests related to CSV output of grades
+     * for persistence and reporting.
+     */
+    @Nested
+    class GradeCsvTests
+    {
+        @Test
+        void getGradesCSVWithGradesReturnsCommaSeparatedValues()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+            student.addGrade(7);
+            student.addGrade(9);
+
+            assertEquals("7,9", student.getGradesCSV());
+        }
+
+        @Test
+        void getGradesCSVWithNoGradesReturnsEmptyString()
+        {
+            Student student = new Student(1, "Alice", "alice@example.com");
+
+            assertEquals("", student.getGradesCSV());
+        }
+    }
+
+    /**
+     * Tests related to the string representation
+     * of student details.
+     */
+    @Nested
+    class StudentToStringTests
+    {
+        @Test
+        void toStringIncludesCourseAndAttendance()
+        {
+            Course course = new Course("CS101", "Computer Science");
+            Student student = new Student(1, "Alice", "alice@example.com", course);
+            student.setAttendancePercentage(95.0);
+
+            String output = student.toString();
+
+            assertAll
+            (
+                () -> assertTrue(output.contains("CS101")),
+                () -> assertTrue(output.contains("95.0%"))
+            );
+        }
     }
 }

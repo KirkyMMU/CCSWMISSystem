@@ -10,7 +10,7 @@ package mis.util;
  * {@code StudentMenu}, {@code CourseMenu}) where it should be caught and
  * handled by re-routing control flow back to the main menu.</p>
  * 
- * <h2>Design Notes:</h2>
+ * <b>Design Notes:</b>
  * <ul>
  *   <li>Extends {@link RuntimeException} so it can propagate without
  *       explicit declaration in method signatures.</li>
