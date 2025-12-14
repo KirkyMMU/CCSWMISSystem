@@ -2,6 +2,7 @@ package mis.ui;
 
 import mis.services.DataManager;
 import mis.util.Inputs;
+import mis.util.MenuEscapeException;
 
 /**
  * Handles the main entry menu for the MIS System.
@@ -41,34 +42,44 @@ public class MainMenu
      */
     public boolean show()
     {
-        System.out.println("\n ~~~~~ Main Menu ~~~~~\n");
-        System.out.println("1. Students");
-        System.out.println("2. Staff");
-        System.out.println("3. Courses");
-        System.out.println("4. Reports");
-        System.out.println("5. Save/Load");
-        System.out.println("6. Exit");
-
-        int choice = Inputs.readInt("\nChoose an option (1-6):");
-
-        switch(choice)
+        while(true)
         {
-            case 1 -> new StudentMenu(manager).show();
-            case 2 -> new StaffMenu(manager).show();
-            case 3 -> new CourseMenu(manager).show();
-            case 4 -> new ReportsMenu(manager).show();
-            case 5 -> new SaveLoadMenu(manager).show();
-            case 6 ->
+            System.out.println("\n ~~~~~ Main Menu ~~~~~\n");
+            System.out.println("1. Students");
+            System.out.println("2. Staff");
+            System.out.println("3. Courses");
+            System.out.println("4. Reports");
+            System.out.println("5. Save/Load");
+            System.out.println("6. Exit");
+            try
             {
-                // Confirm exit before terminating loop
-                boolean confirmExit = Inputs.confirm("\nAre you sure you want to exit?");
-                if(confirmExit)
+                int choice = Inputs.readInt("\nChoose an option (1-6):");
+
+                switch(choice)
                 {
-                    return false; // signal to stop
+                    case 1 -> new StudentMenu(manager).show();
+                    case 2 -> new StaffMenu(manager).show();
+                    case 3 -> new CourseMenu(manager).show();
+                    case 4 -> new ReportsMenu(manager).show();
+                    case 5 -> new SaveLoadMenu(manager).show();
+                    case 6 ->
+                    {
+                        // Confirm exit before terminating loop
+                        boolean confirmExit = Inputs.confirm("\nAre you sure you want to exit?");
+                        if(confirmExit)
+                        {
+                            return false; // signal to stop
+                        }
+                    }
+                    default -> System.out.println("\nInvalid option. Please try again.");
                 }
+                return true; // keep running by default
             }
-            default -> System.out.println("\nInvalid option. Please try again.");
-        }
-        return true; // keep running by default
-    }
-}
+            catch(MenuEscapeException exception)
+            {
+                System.out.println("\nReturning to Main Menu...");
+                return true;
+            } // catch
+        } // while
+    } // void
+} // class
